@@ -1,0 +1,5 @@
+Lovec vltavínů Reborn 5.5
+- JS syntax: OK
+- SW cache: v5-5
+- Intro reverted: yes
+- Gameplay visibility fixes: yes
