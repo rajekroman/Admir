@@ -1,13 +1,16 @@
-# Lovec vltavínů: Na zelené vlně — Reborn 5.3
+# Lovec vltavínů: Na zelené vlně — Reborn 5.2
 
-Aktualizovaná verze webové hry zaměřená na opravu levelu Besednice a pokračování prací na gameplayi, HUDu a animacích postav.
+Mobilní browser hra o hledání vltavínů napříč jižními Čechami. Hlavní cíl: dojet až do KD Slávie na akci **Na zelené vlně** a před porotou složit nejlepší sbírku.
 
-## Hlavní změny 5.3
-- opravená viditelnost hráče v levelu Besednice;
-- čitelnější noční scéna a větší osobní světelný okruh hráče;
-- otevřenější prostor a lepší orientace v Besednici;
-- postavy se natáčejí podle směru pohybu;
-- lepší průběhové info v HUDu a úvodní tipy k levelu.
+## Novinky 5.2
+
+- brandované úvodní menu v barvách Na zelené vlně;
+- výraznější bossové s velkým jménem nad hlavou;
+- větší traktory a stromy;
+- nové 3D pojetí KD Slávie;
+- realističtější obdélníkové profily a výkopy;
+- lepší level brief s vysvětlením úkolu i motivace.
 
 ## Nasazení
-Nahraj celý obsah této složky do nového GitHub repozitáře nebo přepiš stávající soubory v projektu.
+
+Obsah složky nahraj do kořene nového GitHub repozitáře a v GitHub Pages použij **GitHub Actions** nebo statické publikování z hlavní větve.

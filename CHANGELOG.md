@@ -1,18 +1,11 @@
-# Lovec vltavínů Reborn 5.3
+# Lovec vltavínů Reborn 5.2
 
-## Opravy a pokračování bodů 2–3
+## Hlavní změny
 
-### Oprava Besednice
-- hráč je v noci výrazně lépe viditelný, už se neztrácí jen do stínu;
-- Besednice má otevřenější startovní prostor a lepší čitelnost terénu;
-- přidané pracovní lampy a další stopy v těžební ploše;
-- na začátku levelu se zobrazí stručný cíl a tip pro hledání stop.
-
-### Pokračování bodu 2 — gameplay Besednice
-- přepracované obdélníkové profily / hotspoty jsou větší a čitelnější;
-- HUD v Besednici lépe ukazuje průběh: rozhlédni se → najdi stopy → vykopej profil → dostaň ježka zpět.
-
-### Pokračování bodu 3 — HUD a animace postav
-- postavy se nyní natáčejí podle směru pohybu;
-- hráč má v noci světelný halo obrys pro lepší orientaci;
-- akční tlačítko a HUD jsou o něco čitelnější a výraznější.
+- úvodní menu sladěné do barev motivu **Na zelené vlně** a doplněné o hlavní vizuál akce;
+- cíl celé hry jasněji formulovaný: dostat se do KD Slávie na akci Na zelené vlně a sestavit nejlepší sbírku;
+- každý level nyní na začátku jasně ukazuje **co máš udělat** a **proč je to důležité**;
+- bossové jsou výraznější, mají větší siluetu, auru a velké jméno nad hlavou;
+- zvětšené traktory a stromy pro lepší čitelnost a výraznější prostředí;
+- přepracovaný vzhled profilů a děr na poli, v lese i na těžební ploše;
+- KD Slávie je přepracovaná do výraznějšího 3D vzhledu.

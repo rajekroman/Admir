@@ -1,8 +1,15 @@
-Lovec vltavínů Reborn 5.3
+Lovec vltavínů Reborn 5.2
 
-Status:
-- Besednice visibility fix: applied
-- Stage 2 gameplay continuation: applied
-- Stage 3 HUD/animation continuation: applied
-- JS syntax check: pending external command
-- Approx build size: 8962691 B
+Kontroly:
+- JavaScript syntax: pending external check
+- Service worker cache: v5-2
+- Brand image included: yes
+- Build size: 8962708 B
+
+Obsah aktualizace:
+- branding Na zelené vlně
+- nové briefy s vysvětlením úkolu a důvodu
+- výraznější bossové + velké jméno nad hlavou
+- větší traktory a stromy
+- přepracované profily a jámy
+- 3D styl KD Slávie

@@ -116,10 +116,3 @@ button{-webkit-tap-highlight-color:transparent}
   .title-brand{width:min(460px,94vw);border-radius:18px}
   #titleScreen .title-copy h1{font-size:clamp(56px,16vw,84px)}
 }
-
-
-/* v5.3 — Besednice + HUD + character readability */
-.mission-pill{backdrop-filter:blur(10px)}
-.action-button.ready{box-shadow:0 0 0 10px rgba(99,228,155,.1),0 12px 34px rgba(0,0,0,.36)}
-.boss-hud{box-shadow:0 10px 26px rgba(0,0,0,.32)}
-.hint{background:rgba(8,20,14,.88)}
