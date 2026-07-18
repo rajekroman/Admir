@@ -1,0 +1,7 @@
+Kroniky Stříbrné brány — project content notice
+
+Copyright © 2026 Roman Rájek. All rights reserved.
+
+No license is granted to redistribute, sell, sublicense, or republish the original game content, story, artwork, generated assets, music, or branding except with permission from the project owner.
+
+Third-party software remains governed by its own license. See CREDITS_AND_LICENSES.md and vendor/THREE-LICENSE.txt.

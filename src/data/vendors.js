@@ -1,0 +1,35 @@
+export const VENDORS = Object.freeze({
+  tomar: {
+    id: "tomar",
+    name: "Tomarův polní obchod",
+    description: "Výzbroj, zásoby a vykoupené cestovní zboží.",
+    markup: 1.22,
+    buyback: 0.46,
+    stock: {
+      "minor-healing-potion": 8,
+      "mana-tonic": 6,
+      antidote: 5,
+      "travel-ration": 12,
+      "iron-longsword": 1,
+      "oak-buckler": 2,
+      "iron-cap": 2,
+      "trail-boots": 2,
+      "rangers-leathers": 1,
+    },
+  },
+  mira: {
+    id: "mira",
+    name: "Miřin bylinkářský stůl",
+    description: "Léčiva, tonika a alchymistické suroviny.",
+    markup: 1.16,
+    buyback: 0.5,
+    stock: {
+      "minor-healing-potion": 10,
+      "greater-healing-potion": 2,
+      "mana-tonic": 7,
+      "moonleaf-tonic": 2,
+      antidote: 8,
+      "travel-ration": 6,
+    },
+  },
+});

@@ -1,0 +1,1204 @@
+{
+  "product": "Kroniky Stříbrné brány",
+  "version": "4.0.1",
+  "fileCountExcludingManifest": 299,
+  "totalBytesExcludingManifest": 10970134,
+  "files": {
+    ".nojekyll": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "CONTENT_COMPLETION.md": {
+      "bytes": 1881,
+      "sha256": "c4fb32b8958aa87c31b95a5d9d5ee6de030c3ec7f8a756093d1b998e837dc4db"
+    },
+    "CREDITS_AND_LICENSES.md": {
+      "bytes": 1235,
+      "sha256": "873ebbef2598299989721a84ed2a56fcc4d766b12a1c953a1d663549b6421c6a"
+    },
+    "DISTRIBUTION_GUIDE.md": {
+      "bytes": 1550,
+      "sha256": "e827ce21fadb9cadf6a937473b1cfd8e1afa298b48571aad259baa3a65d7b8e7"
+    },
+    "FINAL_QA.md": {
+      "bytes": 1736,
+      "sha256": "0adc890183c65063bbb84af18c9fd0d269c06b38a08bc97b1b78fbfcfead25eb"
+    },
+    "FULL_RELEASE_4_REPORT.md": {
+      "bytes": 3337,
+      "sha256": "28facb4df900e775b7be69c626bc5c032d142574d49d4d44483aa23b8963db49"
+    },
+    "HOTFIX_4_0_1_REPORT.md": {
+      "bytes": 1524,
+      "sha256": "369e49e9a0e01b81ecf18c393f9f8c8fec2fb1b283af0a73eb9bbd4e616abd2a"
+    },
+    "LICENSE.txt": {
+      "bytes": 423,
+      "sha256": "823047d3df1b8832378b975c6289a067944a55bd6fa154eb71b28651642ac144"
+    },
+    "PROFESSIONAL_VISUAL_EDITION.md": {
+      "bytes": 2662,
+      "sha256": "6cb88e893ed81ba5c184fd54c18fc655a32bd74b333ee7033a45bd033aa9736c"
+    },
+    "README.md": {
+      "bytes": 4657,
+      "sha256": "c4e39e75b339304dd0fae522bb95c6e3dd78e3ecfae7e075c0ad81bc8624807f"
+    },
+    "assets/audio/ambience/archive-whispers.mp3": {
+      "bytes": 140844,
+      "sha256": "62820784a0e79d4c5560fc4a4038b71617cd5b779c7fc48bc43bc6d3f3931818"
+    },
+    "assets/audio/ambience/ash-wind.mp3": {
+      "bytes": 140844,
+      "sha256": "dac0a2ead7ee3e2340edcf7d9ba96447ef53d675c9ddf056d6df178ba39dfd6c"
+    },
+    "assets/audio/ambience/citadel-wind.mp3": {
+      "bytes": 140844,
+      "sha256": "e31f44168e43504f63bf3d8a86d69b7e2d03e088ed03c6d39831bd0a7d1f494e"
+    },
+    "assets/audio/ambience/crypt-depths.mp3": {
+      "bytes": 140844,
+      "sha256": "8c8865bfcf71595dfa0ec9bac4a83c63296792a96d361d5c43ce6ef364a5ff26"
+    },
+    "assets/audio/ambience/flooded-abbey.mp3": {
+      "bytes": 140844,
+      "sha256": "854430ab09b5a3f0a1de613022945e882d6038a4cd07845e98748fbc3a5c3654"
+    },
+    "assets/audio/ambience/forest.mp3": {
+      "bytes": 140844,
+      "sha256": "26323aa7f4ecf74c58892601c5d588a364a7039a00dd0a107df6e242f70afb27"
+    },
+    "assets/audio/ambience/glass-chimes.mp3": {
+      "bytes": 140844,
+      "sha256": "2b95c3dcfa59adf2b2fae441168c746e45095b7d3bf7ac573ca50640dcfeb3e8"
+    },
+    "assets/audio/ambience/harbor.mp3": {
+      "bytes": 140844,
+      "sha256": "51993871886641e73064fbdd0e3dfd350e50598a1bdc90c72ff816567c2415e9"
+    },
+    "assets/audio/ambience/mountain-wind.mp3": {
+      "bytes": 140844,
+      "sha256": "4624ac646b4903a595a80d09bd548e375a34b6df284a89cf7cc9ca8c1e4e4744"
+    },
+    "assets/audio/ambience/void-drone.mp3": {
+      "bytes": 140844,
+      "sha256": "6a8bd5e62da82d21e2043290307ccb0ef9dfd872229c545b20bb9c3fe94cdc75"
+    },
+    "assets/audio/audio-index.json": {
+      "bytes": 21438,
+      "sha256": "79127ed84540ac8750653cabcb645bb20c70e3822f2419e38c3aacedc01873f7"
+    },
+    "assets/audio/music/ashen-march.mp3": {
+      "bytes": 275270,
+      "sha256": "ab02c25bc83359d6d8d2d9ecd54b66ff0e7ed1dcdcd35c3b5e2b58205ed74865"
+    },
+    "assets/audio/music/boss.mp3": {
+      "bytes": 312573,
+      "sha256": "7ead29a9c999495e8bed9ae0a8a643f322d74a26322e3405fdd8f86cb737cd79"
+    },
+    "assets/audio/music/combat.mp3": {
+      "bytes": 350189,
+      "sha256": "1d6d21c0fc75a73f8543a0c8f05bb4db5f9072b4061ee0b4d242ffc0fdd731be"
+    },
+    "assets/audio/music/crown-citadel.mp3": {
+      "bytes": 321036,
+      "sha256": "40f8904629f7f4a03e581758cf1a7ed7542a6cc013e119c2ab95e396adaaa2a7"
+    },
+    "assets/audio/music/crypt.mp3": {
+      "bytes": 361160,
+      "sha256": "c93827ce37c0f42809048534d5836f997a98e937efe1ae18be86ef2913bea02c"
+    },
+    "assets/audio/music/drowned-abbey.mp3": {
+      "bytes": 350189,
+      "sha256": "6955686190e21d6ffc4bd185dc28433adc2ee25021d5f70aa2a0711a81449f8c"
+    },
+    "assets/audio/music/glasswood.mp3": {
+      "bytes": 241102,
+      "sha256": "ec295959c9fec9921e1f780c62f5e01f88a6b08eb2e334955d1301b028158758"
+    },
+    "assets/audio/music/hollow-throne.mp3": {
+      "bytes": 398463,
+      "sha256": "a268aa83780584e11a02404da104ca5e14661f0618825e8a6d2b73c38cd82623"
+    },
+    "assets/audio/music/menu.mp3": {
+      "bytes": 304422,
+      "sha256": "407f50889b7c439c29124932038a1444742f0f3691d2d36fd596340baa49d443"
+    },
+    "assets/audio/music/obsidian-archive.mp3": {
+      "bytes": 372759,
+      "sha256": "fde2930b80a57a0e6b9bb353f86557c9966b1e59f6be19b1ad6c894c1ae9e06a"
+    },
+    "assets/audio/music/pass-day.mp3": {
+      "bytes": 333575,
+      "sha256": "31415ae52d7c331336a6625cab83b3036e184cd50b712002ab33f22bcc9ac470"
+    },
+    "assets/audio/music/pass-night.mp3": {
+      "bytes": 296586,
+      "sha256": "e0d24b7efb939a654db62caf8acb40f3278e3aab039555aeff87ee687d6f7dc3"
+    },
+    "assets/audio/music/silverhaven.mp3": {
+      "bytes": 263044,
+      "sha256": "375747aac778d055c5c8978ac588a4e8922af4eb191a9c1ed150f743d613584e"
+    },
+    "assets/audio/music/vale-day.mp3": {
+      "bytes": 251446,
+      "sha256": "5a1fa1820bae0507f29b9317264d8e892aee8a6cf1ec16249df3eb3f40b7c1c5"
+    },
+    "assets/audio/music/vale-night.mp3": {
+      "bytes": 330127,
+      "sha256": "f0d1f13c733fc0311f97914f3e36615ffb0ae662953b8e7c0fec9a4507390cd9"
+    },
+    "assets/audio/sfx/collect.mp3": {
+      "bytes": 6077,
+      "sha256": "ff318281f9a723768d61ddecb54765a0c2a8423a3c02a21646365ac1f25fa96c"
+    },
+    "assets/audio/sfx/discovery.mp3": {
+      "bytes": 11014,
+      "sha256": "9a5da2014120d7bfc467ad16d72aed4206fd792a95ad2d7a499e1af1047ede63"
+    },
+    "assets/audio/sfx/door-close.mp3": {
+      "bytes": 5163,
+      "sha256": "dc499ff5a29dd1de26915aff384996424097f9cc4217e00bc06796727f7fa26c"
+    },
+    "assets/audio/sfx/door-locked.mp3": {
+      "bytes": 2237,
+      "sha256": "8e6fe5722b733b97deff1460f8aef9b6215e4b9eaa35fda1aeb7b2c64b1c4cdb"
+    },
+    "assets/audio/sfx/door-open.mp3": {
+      "bytes": 5163,
+      "sha256": "ad20173087a8451e234e6d974717212f292706f90efc1453c93df9cf493f5f5c"
+    },
+    "assets/audio/sfx/hit-armor.mp3": {
+      "bytes": 3334,
+      "sha256": "98f37b0d05b8102fdd0f191af9c9751952f0902a80cbe293e927d226bc69830c"
+    },
+    "assets/audio/sfx/hit-critical.mp3": {
+      "bytes": 4797,
+      "sha256": "3b4c9dc5f2157f19c1dd817fd4168e62416dec21d75175c73985a4b1123a956e"
+    },
+    "assets/audio/sfx/hit-flesh.mp3": {
+      "bytes": 2237,
+      "sha256": "3d45ed06ef78e89362731b8ea4aa33ce25b713c2b9298f1d2c3f3221ecd0e718"
+    },
+    "assets/audio/sfx/lever.mp3": {
+      "bytes": 3883,
+      "sha256": "e9f0751ad9d504b37b6fb3e739296d155418b0e5fe4b6fbc0fc70286015139f1"
+    },
+    "assets/audio/sfx/magic-fail.mp3": {
+      "bytes": 2237,
+      "sha256": "ee8973490ca34e57f447ab3a4eaa169f3877809d15d2d0eb7ef3da7ea3b3596f"
+    },
+    "assets/audio/sfx/magic-fire.mp3": {
+      "bytes": 4248,
+      "sha256": "18d23860e30c5c29d31f474cf40ca5b5f82063a35c450b6b410193d489f55184"
+    },
+    "assets/audio/sfx/magic-frost.mp3": {
+      "bytes": 6443,
+      "sha256": "b4d7e12fe5055e97852e63e0c44ba1c9231ceeaea3c938cdca56be34e4eeaafa"
+    },
+    "assets/audio/sfx/magic-heal.mp3": {
+      "bytes": 11746,
+      "sha256": "4dab6e9f9a1fb45c40121e93624d252ff488b5bfe808446293b0ccfb05134ff7"
+    },
+    "assets/audio/sfx/magic-lightning.mp3": {
+      "bytes": 3700,
+      "sha256": "4079cee3c016e1f5d72ac30e1db9d359fc46476dfd144eedb9ad992998849dfb"
+    },
+    "assets/audio/sfx/magic-poison.mp3": {
+      "bytes": 4980,
+      "sha256": "dae5100ebfc068a3a6f12bb0fd9334faf803b5024b3e195360648d8d0fcfc9ec"
+    },
+    "assets/audio/sfx/magic-spirit.mp3": {
+      "bytes": 5528,
+      "sha256": "56d7bb5ce2ccff44a55e5c5343baa9952326b6770c3e6d384905ae229fc92cad"
+    },
+    "assets/audio/sfx/miss.mp3": {
+      "bytes": 2054,
+      "sha256": "bfa930b6da9cb3cef690c9ecc33f11652edfc692017ea1a952c5c22e147c9496"
+    },
+    "assets/audio/sfx/monster-boss-attack.mp3": {
+      "bytes": 6260,
+      "sha256": "3eadcb1e272556a0443d4ca55a69f6f9d8dae47a228e468430c27a8bef49e967"
+    },
+    "assets/audio/sfx/monster-boss-death.mp3": {
+      "bytes": 11928,
+      "sha256": "11e4eb6d5a9ad5f2fcb295f8652636a33f499e4a0b5721fba78b7bf56d169279"
+    },
+    "assets/audio/sfx/monster-champion-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "0aaf84929a371cc856e2df38fdf4259a791b618650ac1884a9bb84dffe7e164e"
+    },
+    "assets/audio/sfx/monster-champion-death.mp3": {
+      "bytes": 8088,
+      "sha256": "cdcfd287d00b086879142f8e04d379cd281288b731adfd856f36606e34d02d14"
+    },
+    "assets/audio/sfx/monster-crawler-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "1668310094ea7f87aaa1c00a55f0335239cd782c6b997650178d3c6436535a86"
+    },
+    "assets/audio/sfx/monster-crawler-death.mp3": {
+      "bytes": 8088,
+      "sha256": "3caaf9a0bf5ad13da83320a3bc85e2dbce765f7b21da5c33042b6e530d9b0164"
+    },
+    "assets/audio/sfx/monster-cutthroat-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "9b1c61b1924d5d72248c4befc0984faab0f676a1a3e294bc51c94f8ba2eef1b8"
+    },
+    "assets/audio/sfx/monster-cutthroat-death.mp3": {
+      "bytes": 8088,
+      "sha256": "862b17d69acd7d48ccdfe98a9531a1665ffa9b6282af80f68a3dcfc37d27c2e4"
+    },
+    "assets/audio/sfx/monster-golem-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "c789bb6fca4f43e57a3ce261f43b22c3b746329ac6bf9d474acd54732d7bf6cb"
+    },
+    "assets/audio/sfx/monster-golem-death.mp3": {
+      "bytes": 8088,
+      "sha256": "9e32500929e0b8968be2f9f3e47068bd89026000221780dc60071514c39bf267"
+    },
+    "assets/audio/sfx/monster-herald-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "007905f3fe4dbe8714568ad2bc71158e72c8c4fbdd320bf6d35f78ccb02f8724"
+    },
+    "assets/audio/sfx/monster-herald-death.mp3": {
+      "bytes": 8088,
+      "sha256": "b8289fb19019b43c76dd9109f44981a978bd3526ec6790284787d03b6f643324"
+    },
+    "assets/audio/sfx/monster-hound-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "dd574a7025e4a7f49a55cbd5b61d000887ecac67c5034cc3a02fc5315e4050a5"
+    },
+    "assets/audio/sfx/monster-hound-death.mp3": {
+      "bytes": 8088,
+      "sha256": "60a90dcb0a15608111f5b02f317a07538d9bcc79f1b4af260550d84f3a3914ec"
+    },
+    "assets/audio/sfx/monster-knight-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "a885860ecc053fb875316efb65e3b3f417a1078f667e743e2a02d7cabf8d4ac5"
+    },
+    "assets/audio/sfx/monster-knight-death.mp3": {
+      "bytes": 8088,
+      "sha256": "523fadf4967b4f70d0ad752e0d1cea3dec77c13eaa0a5c8f639be5269c2b7ea7"
+    },
+    "assets/audio/sfx/monster-monk-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "a512f821723901df2e3f7f2f88ab01a2b0c03b1b940effc5fd19de301bbfb8c3"
+    },
+    "assets/audio/sfx/monster-monk-death.mp3": {
+      "bytes": 8088,
+      "sha256": "cf7e3be2773a44b90f11fe5162f2496926d698ca94e594deaedc33aea6adfb7f"
+    },
+    "assets/audio/sfx/monster-raider-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "db32c5e1f76d5297d2ffef4da21abdb7a3aa9759743f0952b532d797f78569fc"
+    },
+    "assets/audio/sfx/monster-raider-death.mp3": {
+      "bytes": 8088,
+      "sha256": "4782b7153651382244b79164b768b494d6b0905a974febab6ccef11d395d1473"
+    },
+    "assets/audio/sfx/monster-sentinel-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "6cf66c5e5d0c946feef207e5b29aaebd3dc2ec3ad7a2c56920d79ebc923d99a3"
+    },
+    "assets/audio/sfx/monster-sentinel-death.mp3": {
+      "bytes": 8088,
+      "sha256": "09e6fc260ac79283fa780d2e3f73bfebf054cbb75f88453b61350059a3df203d"
+    },
+    "assets/audio/sfx/monster-shade-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "eb427e754ef5c2740cd8e23cdfeebdf150f6778001081b0ee15b38491e4a328e"
+    },
+    "assets/audio/sfx/monster-shade-death.mp3": {
+      "bytes": 8088,
+      "sha256": "3601640429daf0c2b197d3fb41914f5bc0d5530a451ebb868083d4fa63cf7d03"
+    },
+    "assets/audio/sfx/monster-stalker-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "fcc0bbe1ac9c52e1b7ddf47df0000b45bcecffc176c558772bc34d1dc1711f1f"
+    },
+    "assets/audio/sfx/monster-stalker-death.mp3": {
+      "bytes": 8088,
+      "sha256": "52df0e2b9d4e7718e0d5f0322740ab6db83b1a35f4f878fb1fd9856dbe266ae2"
+    },
+    "assets/audio/sfx/monster-wisp-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "ec7ad49f1ea5361928d4665a32b66d15fc8acefc0aee4ec1142aaa8ca8ef63e7"
+    },
+    "assets/audio/sfx/monster-wisp-death.mp3": {
+      "bytes": 8088,
+      "sha256": "220ee18ee175b7b0b5addb2dff89c720f258c5a99b254fe977cd7e5a87b21708"
+    },
+    "assets/audio/sfx/monster-wraith-attack.mp3": {
+      "bytes": 4248,
+      "sha256": "0d8c35dd3a4fb2d0bb12684a2f3540c25c270ada4125019bc89c315cebb39ce3"
+    },
+    "assets/audio/sfx/monster-wraith-death.mp3": {
+      "bytes": 8088,
+      "sha256": "96b2ce209027a1d56d3f2aadbf0eaca53d0a62dcb741fbf583b25c88a8678f4b"
+    },
+    "assets/audio/sfx/quest-complete.mp3": {
+      "bytes": 14671,
+      "sha256": "1461fbf3d81cf0717086a47ba10b29bb86e467b01bba8aada4e668f462f9adaf"
+    },
+    "assets/audio/sfx/quest-update.mp3": {
+      "bytes": 6626,
+      "sha256": "d2ac0d1ad5421b02eea585a545afab795dd6b6f54f274ea1600efcc44bb75332"
+    },
+    "assets/audio/sfx/step-crypt-1.mp3": {
+      "bytes": 1871,
+      "sha256": "012e70ab62174759263e4ca7c2c6edce9bb796d8f76b67db951d087d4a2976b4"
+    },
+    "assets/audio/sfx/step-crypt-2.mp3": {
+      "bytes": 1871,
+      "sha256": "997b8c5ed67e49fb8f6767417b92725679c0f028344dca4232edbdddc6454b49"
+    },
+    "assets/audio/sfx/step-crypt-3.mp3": {
+      "bytes": 1871,
+      "sha256": "c943e5483a7f681c1b18174ce529a54a39bbe89ffd379f113ddbfb44147c96d3"
+    },
+    "assets/audio/sfx/step-grass-1.mp3": {
+      "bytes": 1871,
+      "sha256": "89ebd7e203f1a282022f1bfadfffe8d40515974782e354b9f4232c2a7c6acfbd"
+    },
+    "assets/audio/sfx/step-grass-2.mp3": {
+      "bytes": 1871,
+      "sha256": "1573afc49ec45256d17052a5f9b6301401eea2dd28ec6fdbb736a9025c908564"
+    },
+    "assets/audio/sfx/step-grass-3.mp3": {
+      "bytes": 1871,
+      "sha256": "0b691cecb6b6cb96c3b362710f8d3071ce9b5e973dc55458d1d864c40c5348f6"
+    },
+    "assets/audio/sfx/step-stone-1.mp3": {
+      "bytes": 1871,
+      "sha256": "e76a90e8939d53579ca12ecd2bdbe077b9e05fd1ac9002b8da498ea4ce652aa9"
+    },
+    "assets/audio/sfx/step-stone-2.mp3": {
+      "bytes": 1871,
+      "sha256": "9c7c2fd357f34ef964df7de165ba58a08bfda9cb8336a4e3db93d81786ada4d7"
+    },
+    "assets/audio/sfx/step-stone-3.mp3": {
+      "bytes": 1871,
+      "sha256": "e36cfaff2cf4f92f3b51c88bd8810411024646ae0aa888c3c8c22b73926605ba"
+    },
+    "assets/audio/sfx/tactical-pause.mp3": {
+      "bytes": 5163,
+      "sha256": "bceb4edfbf3d7759730daeaf0f94854fa647aba7fd36f98c59d26174b531f450"
+    },
+    "assets/audio/sfx/tactical-resume.mp3": {
+      "bytes": 5163,
+      "sha256": "f50d1087ac371c99093bb6c658dbbed2856f576482083af4efee83c9cad74ac1"
+    },
+    "assets/audio/sfx/trap-disarm.mp3": {
+      "bytes": 5711,
+      "sha256": "467b572827fc10cb73aeb592905c4e25816e199c27c0c72e527e7aebcd84cbe6"
+    },
+    "assets/audio/sfx/trap-trigger.mp3": {
+      "bytes": 5528,
+      "sha256": "bb7bb74ad5b6287a6a5073bf1883012754400e631c2f5373fe2c39b692686873"
+    },
+    "assets/audio/sfx/ui-click.mp3": {
+      "bytes": 1323,
+      "sha256": "28c1e9d4996b6db5878017fea31359069ee28767782991b6486e4b1a6c83613c"
+    },
+    "assets/audio/sfx/ui-confirm.mp3": {
+      "bytes": 2237,
+      "sha256": "c3dacf30d8d3713950a1f9b12a07f558123e1ee37a68c812fd15df0086760f18"
+    },
+    "assets/audio/sfx/ui-error.mp3": {
+      "bytes": 1871,
+      "sha256": "01e776454f56058574097747801c2f1bebf8b57d201860eb0536b82f7bf54af3"
+    },
+    "assets/audio/sfx/ui-page.mp3": {
+      "bytes": 1688,
+      "sha256": "6f3da0d69f3b219dca799da28fbcc93240fff6d8f75783431553faf24656af1d"
+    },
+    "assets/audio/sfx/weapon-bow.mp3": {
+      "bytes": 2420,
+      "sha256": "d1b341543512005906e227241eef112f7d2494f718022984184faae11606968b"
+    },
+    "assets/audio/sfx/weapon-mace.mp3": {
+      "bytes": 2968,
+      "sha256": "8a4eb34613383c26aa69086371bfcae50160defc67dbe3890ec37c025e3edade"
+    },
+    "assets/audio/sfx/weapon-staff.mp3": {
+      "bytes": 2786,
+      "sha256": "d03291ed428bb7d1d3a2448deaf9c530667127249c1efa1977f6e6ee26961bb3"
+    },
+    "assets/audio/sfx/weapon-sword.mp3": {
+      "bytes": 2420,
+      "sha256": "4f420a9ff3bd1d1694ea7dc8727f520f721391b2a0fc0e5ef1cec0dcfc0d1511"
+    },
+    "assets/audio/sfx/zone-transition.mp3": {
+      "bytes": 9368,
+      "sha256": "88539b4c7bcfba80caa578a888d9f58b9f2de8c0bf19b16cd823c7adb8a9c10e"
+    },
+    "assets/effects/spells.png": {
+      "bytes": 8031,
+      "sha256": "450dea1b99b5c4a795d4b4b0717becb4e04f03b05deefb4b8a6d5acdeef4524b"
+    },
+    "assets/icons/apple-touch-icon.png": {
+      "bytes": 45677,
+      "sha256": "3f3e2e75d305d266df890bf45cb6a60147ce42eec52986537ae237483731f1ea"
+    },
+    "assets/icons/icon-192.png": {
+      "bytes": 52542,
+      "sha256": "71ebdb98dafab08874397865dffb3b23740f5419da7ae9a377043ba08693dfbc"
+    },
+    "assets/icons/icon-512.png": {
+      "bytes": 302890,
+      "sha256": "c9f58493f550892cca9e7dda487df8ebb0875a141cf3d973e45a75d2fdec2b59"
+    },
+    "assets/icons/icon-maskable-512.png": {
+      "bytes": 309623,
+      "sha256": "3bc1d1433b0b3236e8c01316365c5629b4ef959bfa0bdc9b6f3b98eae5dc3e70"
+    },
+    "assets/sprites/enemies.png": {
+      "bytes": 21930,
+      "sha256": "3f9a1db1620fea92495b217ffee8704017b0eae1485a9b48ac7309e946104284"
+    },
+    "assets/sprites/weapons.png": {
+      "bytes": 2609,
+      "sha256": "3f2eeb837a0add1620842f1454d357035067c4f5e286dbc2ef9a50c1b4863938"
+    },
+    "assets/sprites/world.png": {
+      "bytes": 15644,
+      "sha256": "5610aef7cace0928767f65f6184b0a0e64d7ed11d67c6b3973cdb88fc79a7278"
+    },
+    "assets/textures/floors.png": {
+      "bytes": 2400,
+      "sha256": "b429202cc765caa3a3fc337c8fd63a373eeb06edd227986bd5cf21ace6745457"
+    },
+    "assets/textures/professional/crypt-floor.png": {
+      "bytes": 18852,
+      "sha256": "4bd56d27cc7cc1d90d2bad08f8445e444aba4df8e1e9a11c271e1647c2c1f5d0"
+    },
+    "assets/textures/professional/crypt-wall.png": {
+      "bytes": 19084,
+      "sha256": "bad99ec6f6c2fb5dc8224faba18b751ae3a6930384a44eca940a5032e0773257"
+    },
+    "assets/textures/professional/grass.png": {
+      "bytes": 14349,
+      "sha256": "90a5d01c52fa40f792866e7e5b70ee7978e29bbba06150f54db55cf163b1cfcb"
+    },
+    "assets/textures/professional/hedge.png": {
+      "bytes": 10474,
+      "sha256": "29aeb71040494ab02f49dfde0b558a678a7d67f6760ad8c0d15e90f724466f5a"
+    },
+    "assets/textures/professional/rune-wall.png": {
+      "bytes": 16535,
+      "sha256": "1638734e84a7bb3998efe4bd0660e1ca67fadd1a799f9a0fbcf0d193201aaf36"
+    },
+    "assets/textures/professional/stone-floor.png": {
+      "bytes": 16956,
+      "sha256": "b65544d8fe0d987e7c7e16ca2a75c8c358898c6e90db22ba377ab5fa62727556"
+    },
+    "assets/textures/professional/stone-wall.png": {
+      "bytes": 17025,
+      "sha256": "7406612efe3353dedbbcf980b5e6c05f4c22313200f66b389fa298336da03693"
+    },
+    "assets/textures/professional/wood-door.png": {
+      "bytes": 18251,
+      "sha256": "10d72cba020aa7bed32e8718cc5130dc072ace99bec92377865f8c9830c773f8"
+    },
+    "assets/textures/walls.png": {
+      "bytes": 4280,
+      "sha256": "91831f3b5bae18caf6b2fc9ae8be2f8f942b4bc627291c695478a3edac04fae0"
+    },
+    "assets/textures/world/abbey-floor-d.png": {
+      "bytes": 17663,
+      "sha256": "e67c9647ffc1fa5210d35f79e69f5ba1bcb6f251604ef908e0a4cf1f1e37fd1f"
+    },
+    "assets/textures/world/abbey-floor-n.png": {
+      "bytes": 26272,
+      "sha256": "15a96336c389eb53a8ede84d4bc51e7a1360186a677c23df1595893ca541085c"
+    },
+    "assets/textures/world/abbey-floor-r.png": {
+      "bytes": 8627,
+      "sha256": "6e30505b45443347cfdd124fa518b40ad8b9ef9a1bd86f76ea7ae9f2946606c3"
+    },
+    "assets/textures/world/abbey-wall-d.png": {
+      "bytes": 18562,
+      "sha256": "2d5916174828ee563df145b4c7d53c9759bc4a79d05766da43dc12725b0363a0"
+    },
+    "assets/textures/world/abbey-wall-n.png": {
+      "bytes": 26523,
+      "sha256": "d28e6268b74f871ad956115c1a50da1b8cc7f0e291d2031876ab32da52975b2f"
+    },
+    "assets/textures/world/abbey-wall-r.png": {
+      "bytes": 8518,
+      "sha256": "a2d68bb98cbaa0e755e2ebcb632be7993a5ba988ead33728ccbb718c403ae2e1"
+    },
+    "assets/textures/world/abbey-water-d.png": {
+      "bytes": 17667,
+      "sha256": "11bf6ff938c2977de0e3b26bb64f19d78856d329481df5fc2bee3ac8a2af48c7"
+    },
+    "assets/textures/world/abbey-water-n.png": {
+      "bytes": 23032,
+      "sha256": "99a227672a1b65b5adf7994c7c9035dd8562bc3d558b2bec1ef9a63cb9da6aa7"
+    },
+    "assets/textures/world/abbey-water-r.png": {
+      "bytes": 8186,
+      "sha256": "f57f77df46d18fd9ac004830bea253edb031f5825acdf89f209212b09d27d762"
+    },
+    "assets/textures/world/archive-floor-d.png": {
+      "bytes": 17264,
+      "sha256": "2d26ba46c3cb84f4798189238745019bef880ff6d4f1b90dca0168aa8f2d930f"
+    },
+    "assets/textures/world/archive-floor-n.png": {
+      "bytes": 26187,
+      "sha256": "8e75a7a9c89ac1789c22e16c06c9ae78e6a32715946d0031cb82ddecdd25afca"
+    },
+    "assets/textures/world/archive-floor-r.png": {
+      "bytes": 8600,
+      "sha256": "cf05c70f14ee415fa8685c660f92ca91fcda1e54a33970060b09ca592261e498"
+    },
+    "assets/textures/world/archive-wall-d.png": {
+      "bytes": 17187,
+      "sha256": "155529c78c5142c9c17191cbb4ddea5c88539ec768d8a3f8782b49eb85a9a54e"
+    },
+    "assets/textures/world/archive-wall-n.png": {
+      "bytes": 26613,
+      "sha256": "5020c9602acad52b580d14087530c4033ddb2509834a2fcfc5042089b04b5bd7"
+    },
+    "assets/textures/world/archive-wall-r.png": {
+      "bytes": 8566,
+      "sha256": "4755690d2069465e0954b9bf774649218117591a2416aa936615c50c8e0d269f"
+    },
+    "assets/textures/world/ash-ground-d.png": {
+      "bytes": 21237,
+      "sha256": "cead6627d25a41b337934a8ffbcaa653ec59a803f0e9f4f9663b91930edafbcc"
+    },
+    "assets/textures/world/ash-ground-n.png": {
+      "bytes": 26104,
+      "sha256": "6ecf77e9cec9977ce2459cff1cb31ee262de0a4e115afadb8915dea72b3fa00d"
+    },
+    "assets/textures/world/ash-ground-r.png": {
+      "bytes": 8436,
+      "sha256": "c257456eec1fe466997a44954e31d038332225d33a972117d5cd91a21fed2dee"
+    },
+    "assets/textures/world/ash-rock-d.png": {
+      "bytes": 17289,
+      "sha256": "e1c83869432f0859721696f8af5f57d48d34b6f87a77cc5ca52eb5954eb82155"
+    },
+    "assets/textures/world/ash-rock-n.png": {
+      "bytes": 23943,
+      "sha256": "1d5025b908ac94c1ff6f612ac384c6b673e4a2300ab51f1d6d1bbfe1afd08d60"
+    },
+    "assets/textures/world/ash-rock-r.png": {
+      "bytes": 7737,
+      "sha256": "09d33e2e409982f515b2f01944e0f14c86c6a5a098dcd2f7ca100bd62d7cd87e"
+    },
+    "assets/textures/world/book-leather-d.png": {
+      "bytes": 22791,
+      "sha256": "599c745f93f2e71e7c286cfa6193b2e5f54f13023929d7245abb93d37fe602aa"
+    },
+    "assets/textures/world/book-leather-n.png": {
+      "bytes": 21284,
+      "sha256": "0c641cfa442f8bbcf30d225a3b2b90fe57b94610540b77a67031d0d5aad16426"
+    },
+    "assets/textures/world/book-leather-r.png": {
+      "bytes": 8079,
+      "sha256": "f996cb009648d8943d00ececebb63966742a9fa4076dd3d15f9c8129a82f1cbc"
+    },
+    "assets/textures/world/burnt-wood-d.png": {
+      "bytes": 17553,
+      "sha256": "aa2f47fb8cf2a02bb03a3fc8696eb117d2724aaf1c15085e576a91f2cd3dd9e5"
+    },
+    "assets/textures/world/burnt-wood-n.png": {
+      "bytes": 23054,
+      "sha256": "c13c6beb932fe3f1afb5b99d257a334ae560294c98703f5b15b97729f857cd19"
+    },
+    "assets/textures/world/burnt-wood-r.png": {
+      "bytes": 8391,
+      "sha256": "a098e2526abeb29f3756002966693531dd8502eb55b6b4409c4554667287808f"
+    },
+    "assets/textures/world/citadel-floor-d.png": {
+      "bytes": 17809,
+      "sha256": "e8ec8644838b9727868ea309829cba060aee3bdb97b107eb96c099316a318dbb"
+    },
+    "assets/textures/world/citadel-floor-n.png": {
+      "bytes": 27248,
+      "sha256": "d9d277b245861eef7b2c0fdd1d18ec5cc68b996ee248a65ec626f74d1186aaae"
+    },
+    "assets/textures/world/citadel-floor-r.png": {
+      "bytes": 8798,
+      "sha256": "8a037a4c3a0be907a10f470c96350805afda05fea51577e765064ab79c53eb28"
+    },
+    "assets/textures/world/citadel-wall-d.png": {
+      "bytes": 17482,
+      "sha256": "dd13bb50005ee9a52ca10f4fb24a315e8779f18f5165049346c25dbf7f9916e2"
+    },
+    "assets/textures/world/citadel-wall-n.png": {
+      "bytes": 26704,
+      "sha256": "53a2af1eea28946ff38965b52d58e00d9ec6696091a97d471636df4a689c57bc"
+    },
+    "assets/textures/world/citadel-wall-r.png": {
+      "bytes": 8531,
+      "sha256": "0d47cd5a471ea777acab8a45c772c0baaf920c4d467fc73a2fbc975074fc8a30"
+    },
+    "assets/textures/world/crypt-floor-d.png": {
+      "bytes": 17677,
+      "sha256": "0000e40fae3891598169cd4d6f0ec887a3ae8115479a2b9cce86def9be4d03e1"
+    },
+    "assets/textures/world/crypt-floor-n.png": {
+      "bytes": 26511,
+      "sha256": "eedde8df2de3f2bb9e6102fa745e2d496a36e3a0ff3cb2acc6c46c527281c32c"
+    },
+    "assets/textures/world/crypt-floor-r.png": {
+      "bytes": 7731,
+      "sha256": "b63b09f80ce3064eae7891830ae0380bcd6c71d9e895aa4f8d8187fc72a9103e"
+    },
+    "assets/textures/world/crypt-wall-d.png": {
+      "bytes": 17284,
+      "sha256": "61abb17d80c207731cfef238a64e8630d678aa07e73d2ca4e912c8c013390071"
+    },
+    "assets/textures/world/crypt-wall-n.png": {
+      "bytes": 26591,
+      "sha256": "e281fb4efc95dd5184d0b0d219979489d60f2432f68638c212e0e5d99258bc1d"
+    },
+    "assets/textures/world/crypt-wall-r.png": {
+      "bytes": 7502,
+      "sha256": "89e7bff226c6fba24f154f97c93c3effb4c12bf80ccbadde4ecf2e58456b53a5"
+    },
+    "assets/textures/world/glass-bark-d.png": {
+      "bytes": 18120,
+      "sha256": "8be987022f6cb471a551951d56778becdb054b8e945ca71c5c6f63212f92bc89"
+    },
+    "assets/textures/world/glass-bark-n.png": {
+      "bytes": 23382,
+      "sha256": "5a98d622efba62712a0f18e73064f751fae2b6a59436ccc1bf498697566cf67f"
+    },
+    "assets/textures/world/glass-bark-r.png": {
+      "bytes": 8558,
+      "sha256": "545866ef4945dae7e07fadf70d2f037e29ebf23812df19f94885d32053d9e28e"
+    },
+    "assets/textures/world/glass-crystal-d.png": {
+      "bytes": 18274,
+      "sha256": "e066f9eb0903f22949975cb9821fcd665b973e1016550119e09905b99362bfa8"
+    },
+    "assets/textures/world/glass-crystal-n.png": {
+      "bytes": 23902,
+      "sha256": "1295efdd627252cdd4b94b0c3343fdb7b8525622438ad8f0fdd309cf63a0122c"
+    },
+    "assets/textures/world/glass-crystal-r.png": {
+      "bytes": 8566,
+      "sha256": "2217276ff909a077aeaf9c94c756eec7ca424b8d74d7ad18d5c4411ac056d1a2"
+    },
+    "assets/textures/world/glass-soil-d.png": {
+      "bytes": 20839,
+      "sha256": "a01b48cc67e81aaabc74781ce4239655633448b398808abd0cf483694506e538"
+    },
+    "assets/textures/world/glass-soil-n.png": {
+      "bytes": 25899,
+      "sha256": "1c8934d91855f2d99832f6e1148aec272f3086068ca326e25b0bce6d11c83916"
+    },
+    "assets/textures/world/glass-soil-r.png": {
+      "bytes": 8668,
+      "sha256": "45b0825ae41328bb30207982505b07176f96e1054382647ac09b9ee20a3d35e7"
+    },
+    "assets/textures/world/harbor-cobble-d.png": {
+      "bytes": 16650,
+      "sha256": "b56d76d66eeb1e1ea640b982aaee003e12080d0617d12636fbf0fe03fbce0ce3"
+    },
+    "assets/textures/world/harbor-cobble-n.png": {
+      "bytes": 24955,
+      "sha256": "8dbbc1a3eaa4737a6cff8a799020ef44222b66104570cd32b0c5277d4638647b"
+    },
+    "assets/textures/world/harbor-cobble-r.png": {
+      "bytes": 8833,
+      "sha256": "2bfbe18f80869631fe4e037694d6e1690ee6561596cd5ab1464c896b44414c2a"
+    },
+    "assets/textures/world/harbor-plaster-d.png": {
+      "bytes": 19977,
+      "sha256": "6519e32660844ba548255506814ecdddbdc5fefc229747a72d723c2ed8441d71"
+    },
+    "assets/textures/world/harbor-plaster-n.png": {
+      "bytes": 23619,
+      "sha256": "f0af440f666f9748428c0083dabb1a852d0d22c05ddd9739c8c4d258709039ad"
+    },
+    "assets/textures/world/harbor-plaster-r.png": {
+      "bytes": 8526,
+      "sha256": "baa1c30c08640f0264def6300426530f3927dec3135e5d43d603553b6b2ad2f1"
+    },
+    "assets/textures/world/harbor-timber-d.png": {
+      "bytes": 17232,
+      "sha256": "5794229abff904488253249ce2bb0e78d6d8e9ad32c491d64154873b02d25551"
+    },
+    "assets/textures/world/harbor-timber-n.png": {
+      "bytes": 23523,
+      "sha256": "0370ad5e68e0785fc3489c6b1d114fc8e711c430687332ec73c4d192f5a02ba0"
+    },
+    "assets/textures/world/harbor-timber-r.png": {
+      "bytes": 8638,
+      "sha256": "a082b07ba61ce01263e383391c70db4e6e91c4c30daabc0017bbc3dabecc8845"
+    },
+    "assets/textures/world/iron-d.png": {
+      "bytes": 1230,
+      "sha256": "36d343eef16d6deb1a5d434bc73e6655553a273bc938f4e2074d02b17658e285"
+    },
+    "assets/textures/world/iron-n.png": {
+      "bytes": 21417,
+      "sha256": "701a4c9cd9bc648640c6103c7d751030cc663da3922c12b75bf3909999b28e8f"
+    },
+    "assets/textures/world/iron-r.png": {
+      "bytes": 8014,
+      "sha256": "6c918ed1e261d4a7a17753353ca684d90f15ff56658bbd479981d7f67c5bfb53"
+    },
+    "assets/textures/world/oak-door-d.png": {
+      "bytes": 15120,
+      "sha256": "ba6dde630d595fea7cea2401165132f59e2291fc4946f788eb4a049505f55753"
+    },
+    "assets/textures/world/oak-door-n.png": {
+      "bytes": 21912,
+      "sha256": "458c29298dd2b0bd86fb98d173487d6d4d6b10c4834865d6e8dbdbef1ddbebeb"
+    },
+    "assets/textures/world/oak-door-r.png": {
+      "bytes": 8630,
+      "sha256": "73b7db7e58b41024331386d263baae6307d8389d6a5a5fb92af550986a227d01"
+    },
+    "assets/textures/world/pass-road-d.png": {
+      "bytes": 16221,
+      "sha256": "2441c62da7fe0f660469ebc48e7613a769e881f30076e0df9e2a6830f7038b77"
+    },
+    "assets/textures/world/pass-road-n.png": {
+      "bytes": 23854,
+      "sha256": "e61b86975444984b1b52d0c900388a87f2bd82c37d89121121d3b457c0f54468"
+    },
+    "assets/textures/world/pass-road-r.png": {
+      "bytes": 8617,
+      "sha256": "8d2bcb9ae0be581b4b83b8fd71aca648714fbbf31daabe568c9904ab85a812da"
+    },
+    "assets/textures/world/pass-slate-d.png": {
+      "bytes": 19961,
+      "sha256": "621b5d9439dc2dd652bb1861d6b5b23172da7e5044751b209bb820094e755ed4"
+    },
+    "assets/textures/world/pass-slate-n.png": {
+      "bytes": 28804,
+      "sha256": "910dee4a8d976266601340d5530cfe5e42c8836c0650566dc3d52db270a9a895"
+    },
+    "assets/textures/world/pass-slate-r.png": {
+      "bytes": 9496,
+      "sha256": "9a5d8c41d3dd49c9fe523c72865a598786296b13eb184370d910ccc8c1456c87"
+    },
+    "assets/textures/world/pass-wall-d.png": {
+      "bytes": 17290,
+      "sha256": "fbba3c4ce8fc3c787cf721faaa83479ecfee9827a340418eb4074f94865e49b7"
+    },
+    "assets/textures/world/pass-wall-n.png": {
+      "bytes": 26615,
+      "sha256": "1cfe93eb97f0f8496c64a1afc65f2e473aabdd329ee3eb0b754e0828d35e86aa"
+    },
+    "assets/textures/world/pass-wall-r.png": {
+      "bytes": 8552,
+      "sha256": "84b1bbe2f3a84bae69e604e2b20600d947a8711c5c30d4dece23cf48a4265d5a"
+    },
+    "assets/textures/world/roof-slate-d.png": {
+      "bytes": 19386,
+      "sha256": "1e15900352465ac4b30d264d0dbde5d856567ec5161255d0b194efd3f5356adb"
+    },
+    "assets/textures/world/roof-slate-n.png": {
+      "bytes": 28501,
+      "sha256": "a8068ac6425b78bb9a9afe8c416df04cc1505efee203fcb217c9d0af6f5fdcb1"
+    },
+    "assets/textures/world/roof-slate-r.png": {
+      "bytes": 9439,
+      "sha256": "315a6ab05585253cc915a9286631c3c738a766ac220757dbc1a2d952b53e3ec8"
+    },
+    "assets/textures/world/royal-banner-d.png": {
+      "bytes": 339,
+      "sha256": "49f0e2833f44deb6781e1125261206f91d5de0a326c4a58605d0fe06dbb77112"
+    },
+    "assets/textures/world/royal-banner-n.png": {
+      "bytes": 21008,
+      "sha256": "c5eff017b096d47774906fc615db16b2fb12b19f3265c1948fd98443d32ad791"
+    },
+    "assets/textures/world/royal-banner-r.png": {
+      "bytes": 8116,
+      "sha256": "1117e40260d95539ec5da23876efddc1e2122c4217c7b0c2781ab83e0aca1611"
+    },
+    "assets/textures/world/throne-floor-d.png": {
+      "bytes": 19348,
+      "sha256": "d564846b20ef47bdbd856814fd1fbf1c8d6a228d455782c487dfe50486442b83"
+    },
+    "assets/textures/world/throne-floor-n.png": {
+      "bytes": 29600,
+      "sha256": "16d8efb6590602825c01a6feb09ae49d86b56aefb1b873a23f93ab1e7e083fdb"
+    },
+    "assets/textures/world/throne-floor-r.png": {
+      "bytes": 9131,
+      "sha256": "711506764554d17ba677623d8ed2ad622a2a9f982b441e216fdbb048d21fd982"
+    },
+    "assets/textures/world/throne-wall-d.png": {
+      "bytes": 18826,
+      "sha256": "95b0e7939ef3c7b3a99072d32f97e49b706fc1b34af28b720f5f7aa0c77af366"
+    },
+    "assets/textures/world/throne-wall-n.png": {
+      "bytes": 28851,
+      "sha256": "eb5acb54a52d369c138deaeeb073ebb0e01b658c2aa065bdb3773b1205670c64"
+    },
+    "assets/textures/world/throne-wall-r.png": {
+      "bytes": 8943,
+      "sha256": "03b2adff402da7ce61d3901878c68cd24b20f9cc00f630fdc62027548c32318c"
+    },
+    "assets/textures/world/vale-earth-d.png": {
+      "bytes": 19522,
+      "sha256": "874574eead273632abca2f5963aba11cc1787b312f1bd5b131fb648e768844f0"
+    },
+    "assets/textures/world/vale-earth-n.png": {
+      "bytes": 25358,
+      "sha256": "12e53a2c9cbc7b36a2ba16943e226f147b5dbbf8d47c8532cf1178ea58b3161d"
+    },
+    "assets/textures/world/vale-earth-r.png": {
+      "bytes": 8602,
+      "sha256": "9465a7e17f54b6fe282a0019d7cf72e0eccd5f69c744cb4f73816ba4f3849de8"
+    },
+    "assets/textures/world/vale-grass-d.png": {
+      "bytes": 24047,
+      "sha256": "cdfa8ec7623aae64f9a6927a3ce615826af32b72771b558d7f379f0a2ae0be06"
+    },
+    "assets/textures/world/vale-grass-n.png": {
+      "bytes": 30557,
+      "sha256": "4a08cff59be77f92d2085bd21304270d57ec7ae1c2b99bbc16058ff9eacbe99e"
+    },
+    "assets/textures/world/vale-grass-r.png": {
+      "bytes": 9072,
+      "sha256": "cffbd09c0a6c71d826bbc56c3651bf781ec36d0730eedad50fa44dc11da1f9c0"
+    },
+    "assets/textures/world/vale-hedge-d.png": {
+      "bytes": 18135,
+      "sha256": "88b4ff5d2c5b483c39056cb6641aafe0401dc90b2e0247daaa0282f29cc05544"
+    },
+    "assets/textures/world/vale-hedge-n.png": {
+      "bytes": 32778,
+      "sha256": "eb0c7fd37596cd829bc40dadf8498073dcbaa919759a986c591bb9ee1266f095"
+    },
+    "assets/textures/world/vale-hedge-r.png": {
+      "bytes": 8980,
+      "sha256": "d834edd8ef9a5722aba8efec8aba4361cb4d4067ded28f9eeeff86d7a1d2acdb"
+    },
+    "assets/textures/world/vale-stone-d.png": {
+      "bytes": 16247,
+      "sha256": "117e2e00037ddc66aed77148e44965f33f2997dbe9878e5a43dac86bc05d4fa7"
+    },
+    "assets/textures/world/vale-stone-n.png": {
+      "bytes": 27312,
+      "sha256": "8c72d1d552bedf960f1db1f0379ff6c71f7fb9deb69202a427213419fe332b63"
+    },
+    "assets/textures/world/vale-stone-r.png": {
+      "bytes": 8836,
+      "sha256": "cf3db3961d2150d644f8225010e9e9e26e25eae43cf3036be0b63e7050cdde8c"
+    },
+    "assets/textures/world/void-crystal-d.png": {
+      "bytes": 18466,
+      "sha256": "c4c15e8dd6427c0f17cf62e1ed46be3291737d8885f097faa8b69098da25f1ec"
+    },
+    "assets/textures/world/void-crystal-n.png": {
+      "bytes": 24466,
+      "sha256": "a4e99ab2b2f73b7b069ba4ad379656312e31bdab7829fef4b3e5e65ccab18447"
+    },
+    "assets/textures/world/void-crystal-r.png": {
+      "bytes": 8625,
+      "sha256": "a76c2f601b8eea4411cb2021e744cd8342aa539405da718fb26f6eeebd0ac4f4"
+    },
+    "assets/ui/full/title-background.jpg": {
+      "bytes": 37879,
+      "sha256": "0c8b85738565450f82536fffad47e4eeadbaf84466fd7a350b97431feb92aba2"
+    },
+    "assets/ui/icons.png": {
+      "bytes": 76492,
+      "sha256": "0c5b2c60c67ef01462a420f29e46a2590cfe6295ca31ff6bd0f8810b1e5244cf"
+    },
+    "assets/ui/professional/button.png": {
+      "bytes": 15466,
+      "sha256": "28d2909610600476b1075ce032c9099345d9d2252122a9a7321ee98c91916274"
+    },
+    "assets/ui/professional/frame-slot.png": {
+      "bytes": 4257,
+      "sha256": "15d2affd54d1402f205bf20e1d8e57fe7d076a17ce6d2dce080e15a44e4473df"
+    },
+    "assets/ui/professional/frame-stone.png": {
+      "bytes": 9958,
+      "sha256": "2488cd7eb3bef693f148145f1f5553609037888620c7eb6abf7853b8755fb43a"
+    },
+    "assets/ui/professional/panel-obsidian.png": {
+      "bytes": 13727,
+      "sha256": "a6e939375f65a3b2a9be33040b80cd33fa3f34522c4a38ceb65303f25b09351f"
+    },
+    "assets/ui/professional/portrait-daren.png": {
+      "bytes": 11910,
+      "sha256": "db79f122ce61d0ff46ca7af6689b5849d15188e4eded32f5591a0f4d6d601dfd"
+    },
+    "assets/ui/professional/portrait-lyra.png": {
+      "bytes": 10846,
+      "sha256": "2504c151fef7df2a133e89184d36aedd125c3517595de1f00ce19a1eaf8b8f3d"
+    },
+    "assets/ui/professional/portrait-orin.png": {
+      "bytes": 10590,
+      "sha256": "8ab1b3f3617ba140f5a60e7c12ad11265d10eeea9192a4b06fe72cc93e239c94"
+    },
+    "assets/ui/professional/portrait-saela.png": {
+      "bytes": 11212,
+      "sha256": "e1bd30a7957feb7d2d469ecf05193f78237ed9275db6a3c2d96f3dda40dfbd11"
+    },
+    "assets/ui/professional/title-background.jpg": {
+      "bytes": 175583,
+      "sha256": "ba5f60ffa6189707c8e2da6edf5f06f4f766bce238ec52b6e80b447faa2cc6ca"
+    },
+    "assets/ui/professional/utility-icons.png": {
+      "bytes": 4141,
+      "sha256": "78b7a2197b359ebd17a7e4e654fa9ceb758b0beb08ba1e7a6228861422123c9e"
+    },
+    "index.html": {
+      "bytes": 8834,
+      "sha256": "d3717e203e98fdb8fcc1737db2ac5543aa4ae18f64c29c54f774ddb9be05647e"
+    },
+    "manifest.webmanifest": {
+      "bytes": 1463,
+      "sha256": "ceeda4d39a0edbe82df912c4d494132a19ded6e9224191e5a972bdb93927538a"
+    },
+    "src/core/AssetManager.js": {
+      "bytes": 3870,
+      "sha256": "f7f21f2e8dcde665a42a484ba48c30554953371206168fb33d759cee0c4ba308"
+    },
+    "src/core/AudioManager.js": {
+      "bytes": 14007,
+      "sha256": "c613a59fb0df76e521295cda883355791c46010fa57192287aff6bf77b9d7e01"
+    },
+    "src/core/Clock.js": {
+      "bytes": 1863,
+      "sha256": "dc5eff666c5479d18f31bb25579354d35abb4f95c86dab06e1a785909aa33639"
+    },
+    "src/core/Game.js": {
+      "bytes": 66833,
+      "sha256": "bd59a4de5906f1bf07d69bc500788efbf0aadf3579593783ef98fb2cfdf77937"
+    },
+    "src/core/InputManager.js": {
+      "bytes": 7693,
+      "sha256": "470b0599094c2f08adc3c2b0d9683c3296bf1a4725476d39af6e8b712070fc96"
+    },
+    "src/core/PerformanceGovernor.js": {
+      "bytes": 3328,
+      "sha256": "43bf5f1af3f9eaa7de4105b9ac341f37b795377eef3d76868ce9fb624d524a00"
+    },
+    "src/core/PreferencesManager.js": {
+      "bytes": 3610,
+      "sha256": "75699ffcccc856422ccac8683e07b1ae1f651ad1a7b6e323b9f3ada34ebc7d47"
+    },
+    "src/core/SaveManager.js": {
+      "bytes": 4177,
+      "sha256": "714f5d113caa0c15b66470b8f0faf7d388d6779a76ceb2315ac3b92041ccadae"
+    },
+    "src/data/abilities.js": {
+      "bytes": 10311,
+      "sha256": "54fdbefadccd6eb9d45d4e9c3f847e8017705614109659d4f28f1d8022a9df7a"
+    },
+    "src/data/assets.js": {
+      "bytes": 3209,
+      "sha256": "b487223a5a99b2b388ff4f4a56eaf6af89961b154e4562494644b71ac0a0e37e"
+    },
+    "src/data/audio.js": {
+      "bytes": 4905,
+      "sha256": "dbefea08ecf2df3c8b8c12c012517d20b79b5e8437e920b6ed80abca3812024b"
+    },
+    "src/data/campaignBoards.js": {
+      "bytes": 588,
+      "sha256": "bb76e6593df434cd190b62d161aa899f67b0bbb6247cfaa36bd85096a7f5314e"
+    },
+    "src/data/campaignDialogues.js": {
+      "bytes": 10598,
+      "sha256": "4a5588cf01860b75f24f4cc5b64d8943e0d2b7ccb2750a5b911c3b5b50892337"
+    },
+    "src/data/campaignEnemies.js": {
+      "bytes": 1258,
+      "sha256": "900e70b0a6e8aad21443a613dda4217de5490ed76e15afca22a9e3f32c19aba5"
+    },
+    "src/data/campaignItems.js": {
+      "bytes": 3073,
+      "sha256": "9ec95250fc9d05e47cf20a043978ce177e3d772f6ba94becb48ccfb9a7bd2ab0"
+    },
+    "src/data/campaignQuests.js": {
+      "bytes": 27966,
+      "sha256": "9e493875f061b17fe8aefa1066598052210961e042fb1fb0203af32a036933be"
+    },
+    "src/data/classes.js": {
+      "bytes": 2905,
+      "sha256": "c91b615bf2d380159ec714f96360d1c38bfafb660208c5884cea6c48eb960dab"
+    },
+    "src/data/dialogues.js": {
+      "bytes": 11499,
+      "sha256": "7a4af27ae25a5c8b6395a3db9ea20ba41098573aac00c0834b55534d0d0a0ee3"
+    },
+    "src/data/endings.js": {
+      "bytes": 2884,
+      "sha256": "f0f58137a9b01743a66aabd97bc87c0994cab60a8df55920acb73f50d214f89e"
+    },
+    "src/data/enemies.js": {
+      "bytes": 8891,
+      "sha256": "86b857d5a0630a95e9ac911bda3f46b1755b77ed4243256d3eb41ff72fd418bc"
+    },
+    "src/data/enemyAbilities.js": {
+      "bytes": 4476,
+      "sha256": "884d7c660cb7108beae815778201e371798d8eb2bddfb7117528084080403938"
+    },
+    "src/data/factions.js": {
+      "bytes": 564,
+      "sha256": "51a52ab751e7334436785de6bd8c4c9e79e439861d0a9323bd40b93be1dac5e0"
+    },
+    "src/data/items.js": {
+      "bytes": 12704,
+      "sha256": "459ca343054070a93ca01205fdbfea3ab010fbd44eea5af2cdc28b2787549a95"
+    },
+    "src/data/lootTables.js": {
+      "bytes": 3492,
+      "sha256": "5ea5ad1d92bbcd5e6f324dc51babbac91a4c53daebc21ceb629f44f9c79df349"
+    },
+    "src/data/party.js": {
+      "bytes": 2013,
+      "sha256": "90a6003369c706fff94fc971447b14c357f8d9e9ba9b550f3f1f381650981aa5"
+    },
+    "src/data/quests.js": {
+      "bytes": 5800,
+      "sha256": "39fcdaa8826d1852d53b0f6666a8f6b914321c47e02b38c7c5a194f77aeb6257"
+    },
+    "src/data/skills.js": {
+      "bytes": 3094,
+      "sha256": "7aba9f20eb929d017113215a368b395caea39ca279dd6eb389913ceba95668c0"
+    },
+    "src/data/vendors.js": {
+      "bytes": 822,
+      "sha256": "594951b63add93829da117e5600586f0834cfd1a87409524a1a5782a02243049"
+    },
+    "src/main.js": {
+      "bytes": 4030,
+      "sha256": "2a76d273cbe3df69970cf5c27f8107e34466e80a516c02e38a3175e016014dff"
+    },
+    "src/render/AnimationState.js": {
+      "bytes": 1674,
+      "sha256": "899b31fc6a544be6d3a0b98e4cec70f0a51bf65e787ed8481800312a50ae88e5"
+    },
+    "src/render/CinematicRenderer.js": {
+      "bytes": 56377,
+      "sha256": "2ba85dc490bbf2bef82bf4f2ef2273d0bc81d25d8063ccc0bd48a5c445715b40"
+    },
+    "src/render/CreatureFactory.js": {
+      "bytes": 24352,
+      "sha256": "4707e81eb111e53f88295ea5791884aafcfa72a484369eadbf88c9c28cfd9d3f"
+    },
+    "src/render/HybridRenderer.js": {
+      "bytes": 1643,
+      "sha256": "5551da388d03d3df31db14232b7536b1f25ce292e69744fc48eab0d81fa7856c"
+    },
+    "src/render/Raycaster.js": {
+      "bytes": 28867,
+      "sha256": "bd144cf44ca840361ae65e58188a8bee64df136ced39b4fc58ebdfb9f56f6c78"
+    },
+    "src/render/WorldArtDirector.js": {
+      "bytes": 25735,
+      "sha256": "91e5711d732cdd04b09004ecc1108968deb45a6d38ff476d568b4942cb9aedc4"
+    },
+    "src/systems/CombatSystem.js": {
+      "bytes": 23156,
+      "sha256": "c81dae8201d0eb0000fcc34c6f691db23a41ab39414771274df4a1f1bc925c66"
+    },
+    "src/systems/ConditionEvaluator.js": {
+      "bytes": 1340,
+      "sha256": "3c8bd838afc021bbe40adfde916054fa038761a4438c500f13681bff7562d4d7"
+    },
+    "src/systems/DialogueManager.js": {
+      "bytes": 3107,
+      "sha256": "cc9e48cc67bd678a53d26567699e1aba8f3ec3a9a1686558ab6605e73961d5e9"
+    },
+    "src/systems/EnemyAI.js": {
+      "bytes": 18338,
+      "sha256": "61c7f98b8b75e84c614b1c9707a8617f064f3ea98abe8257579619ba2847e489"
+    },
+    "src/systems/InventoryManager.js": {
+      "bytes": 11770,
+      "sha256": "551d70b49e1da1a6474d8c85d6fd32590aefb8794c1ac800605d596c412a9b2e"
+    },
+    "src/systems/LootManager.js": {
+      "bytes": 1835,
+      "sha256": "f32c0bb4df8c8036b87a576be595451cc5a9b0a8fe9a978804ee6d1d2e10ded0"
+    },
+    "src/systems/MagicSystem.js": {
+      "bytes": 21160,
+      "sha256": "ea7a6d2e4d3b260aed097939c4bbf56d72a642b7d703da176484887be2c39805"
+    },
+    "src/systems/PartyManager.js": {
+      "bytes": 13633,
+      "sha256": "52bf5909fffe5b66368aeac1dd2282e63beb319eae4c40b70b73bf9582a30a0b"
+    },
+    "src/systems/Pathfinder.js": {
+      "bytes": 2159,
+      "sha256": "a36069ec7c62df0412344ee615c6302cbb4564c5679745010f93497fa4bd5fa7"
+    },
+    "src/systems/QuestManager.js": {
+      "bytes": 6537,
+      "sha256": "481b3b9d276d444b024c2a7bea66aef50a7df339fca71c3a7a331dd9b087dd60"
+    },
+    "src/systems/VendorManager.js": {
+      "bytes": 4596,
+      "sha256": "08bd786c07398cd6ade95d49d6f52cd27020da55dd118c749c54e1a755ce7eba"
+    },
+    "src/ui/Hud.js": {
+      "bytes": 20960,
+      "sha256": "0fc042a3cc2deca5e154c5f999be4ca3a0b16cc81130144ef15fcc2daf7e4978"
+    },
+    "src/ui/ScreenEffects.js": {
+      "bytes": 1802,
+      "sha256": "6ecca1486a3868554906c58ff36f3e335d636c0af0f7699b317179dba4c423a3"
+    },
+    "src/utils/math.js": {
+      "bytes": 568,
+      "sha256": "06c8c610f77799e90dcd65f4fede3cafa7cd4e39293b9588171984c257028502"
+    },
+    "src/world/EnvironmentSystem.js": {
+      "bytes": 13292,
+      "sha256": "aec3a704156110f3330c305f653e7496ae5c33c354c44ab73a15c0a8995a2077"
+    },
+    "src/world/World.js": {
+      "bytes": 28028,
+      "sha256": "f45cbbe9e04e3e20f8fbd0e4906efbcdc463742b88a9744a879f97fc37ecb1b7"
+    },
+    "src/world/campaignZones.js": {
+      "bytes": 71744,
+      "sha256": "70484d9b719422f13154d83e2ec0da857e13b18ab5471a505680bda7c5d04360"
+    },
+    "src/world/fullContentPatches.js": {
+      "bytes": 11060,
+      "sha256": "cdfd913dc0a700a60fd041834837e75127240597f150dc4bf35ee76e4f93e864"
+    },
+    "src/world/maps.js": {
+      "bytes": 12329,
+      "sha256": "d2d853adb174614563bf446de75887d6e2311fb00cd0ea2e28ea970bec0764cf"
+    },
+    "src/world/willowVale.js": {
+      "bytes": 9798,
+      "sha256": "e8b7d2b549ddf7164d98d77995ddb95943dd04a2db1a601f831cecee6e52fb1b"
+    },
+    "styles-final.css": {
+      "bytes": 9086,
+      "sha256": "99815a58cbaebd344889e7eb462c141f1f216fc2c6baa8c38b61b41f7621c9b2"
+    },
+    "styles.css": {
+      "bytes": 20311,
+      "sha256": "25bbf7a3cd0ec5755a4f10e6efd2f5a589f71fcccedf419d2ae0f1af9c064b10"
+    },
+    "sw.js": {
+      "bytes": 9656,
+      "sha256": "44ec2ee7dbda82f52bd406ee9ddd6fca3c80048c14744d539ff8608d3a522d36"
+    },
+    "vendor/THREE-LICENSE.txt": {
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    "vendor/three.core.min.js": {
+      "bytes": 380374,
+      "sha256": "79f2b4f58d3e99a9948a4d3b7f6d5c2daf705bdefe9fb82ebec715623966551c"
+    },
+    "vendor/three.module.min.js": {
+      "bytes": 338836,
+      "sha256": "06552c54e4071fbc7305117aafe6765d92c5d2a2a83507d4f05b9bf4f3d4d463"
+    }
+  }
+}

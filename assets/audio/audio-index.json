@@ -1,0 +1,770 @@
+{
+  "ambience/archive-whispers.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "62820784a0e79d4c5560fc4a4038b71617cd5b779c7fc48bc43bc6d3f3931818"
+  },
+  "ambience/ash-wind.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "dac0a2ead7ee3e2340edcf7d9ba96447ef53d675c9ddf056d6df178ba39dfd6c"
+  },
+  "ambience/citadel-wind.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "e31f44168e43504f63bf3d8a86d69b7e2d03e088ed03c6d39831bd0a7d1f494e"
+  },
+  "ambience/crypt-depths.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "8c8865bfcf71595dfa0ec9bac4a83c63296792a96d361d5c43ce6ef364a5ff26"
+  },
+  "ambience/flooded-abbey.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "854430ab09b5a3f0a1de613022945e882d6038a4cd07845e98748fbc3a5c3654"
+  },
+  "ambience/forest.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "26323aa7f4ecf74c58892601c5d588a364a7039a00dd0a107df6e242f70afb27"
+  },
+  "ambience/glass-chimes.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "2b95c3dcfa59adf2b2fae441168c746e45095b7d3bf7ac573ca50640dcfeb3e8"
+  },
+  "ambience/harbor.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "51993871886641e73064fbdd0e3dfd350e50598a1bdc90c72ff816567c2415e9"
+  },
+  "ambience/mountain-wind.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "4624ac646b4903a595a80d09bd548e375a34b6df284a89cf7cc9ca8c1e4e4744"
+  },
+  "ambience/void-drone.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 14.054,
+    "bytes": 140844,
+    "sha256": "6a8bd5e62da82d21e2043290307ccb0ef9dfd872229c545b20bb9c3fe94cdc75"
+  },
+  "music/ashen-march.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 22.909,
+    "bytes": 275270,
+    "sha256": "ab02c25bc83359d6d8d2d9ecd54b66ff0e7ed1dcdcd35c3b5e2b58205ed74865"
+  },
+  "music/boss.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 26.018,
+    "bytes": 312573,
+    "sha256": "7ead29a9c999495e8bed9ae0a8a643f322d74a26322e3405fdd8f86cb737cd79"
+  },
+  "music/combat.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 29.153,
+    "bytes": 350189,
+    "sha256": "1d6d21c0fc75a73f8543a0c8f05bb4db5f9072b4061ee0b4d242ffc0fdd731be"
+  },
+  "music/crown-citadel.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 26.723,
+    "bytes": 321036,
+    "sha256": "40f8904629f7f4a03e581758cf1a7ed7542a6cc013e119c2ab95e396adaaa2a7"
+  },
+  "music/crypt.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 30.067,
+    "bytes": 361160,
+    "sha256": "c93827ce37c0f42809048534d5836f997a98e937efe1ae18be86ef2913bea02c"
+  },
+  "music/drowned-abbey.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 29.153,
+    "bytes": 350189,
+    "sha256": "6955686190e21d6ffc4bd185dc28433adc2ee25021d5f70aa2a0711a81449f8c"
+  },
+  "music/glasswood.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 20.062,
+    "bytes": 241102,
+    "sha256": "ec295959c9fec9921e1f780c62f5e01f88a6b08eb2e334955d1301b028158758"
+  },
+  "music/hollow-throne.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 33.176,
+    "bytes": 398463,
+    "sha256": "a268aa83780584e11a02404da104ca5e14661f0618825e8a6d2b73c38cd82623"
+  },
+  "music/menu.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 25.339,
+    "bytes": 304422,
+    "sha256": "407f50889b7c439c29124932038a1444742f0f3691d2d36fd596340baa49d443"
+  },
+  "music/obsidian-archive.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 31.033,
+    "bytes": 372759,
+    "sha256": "fde2930b80a57a0e6b9bb353f86557c9966b1e59f6be19b1ad6c894c1ae9e06a"
+  },
+  "music/pass-day.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 27.768,
+    "bytes": 333575,
+    "sha256": "31415ae52d7c331336a6625cab83b3036e184cd50b712002ab33f22bcc9ac470"
+  },
+  "music/pass-night.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 24.686,
+    "bytes": 296586,
+    "sha256": "e0d24b7efb939a654db62caf8acb40f3278e3aab039555aeff87ee687d6f7dc3"
+  },
+  "music/silverhaven.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 21.891,
+    "bytes": 263044,
+    "sha256": "375747aac778d055c5c8978ac588a4e8922af4eb191a9c1ed150f743d613584e"
+  },
+  "music/vale-day.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 20.924,
+    "bytes": 251446,
+    "sha256": "5a1fa1820bae0507f29b9317264d8e892aee8a6cf1ec16249df3eb3f40b7c1c5"
+  },
+  "music/vale-night.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 27.481,
+    "bytes": 330127,
+    "sha256": "f0d1f13c733fc0311f97914f3e36615ffb0ae662953b8e7c0fec9a4507390cd9"
+  },
+  "sfx/collect.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.836,
+    "bytes": 6077,
+    "sha256": "ff318281f9a723768d61ddecb54765a0c2a8423a3c02a21646365ac1f25fa96c"
+  },
+  "sfx/discovery.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.541,
+    "bytes": 11014,
+    "sha256": "9a5da2014120d7bfc467ad16d72aed4206fd792a95ad2d7a499e1af1047ede63"
+  },
+  "sfx/door-close.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.705,
+    "bytes": 5163,
+    "sha256": "dc499ff5a29dd1de26915aff384996424097f9cc4217e00bc06796727f7fa26c"
+  },
+  "sfx/door-locked.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.287,
+    "bytes": 2237,
+    "sha256": "8e6fe5722b733b97deff1460f8aef9b6215e4b9eaa35fda1aeb7b2c64b1c4cdb"
+  },
+  "sfx/door-open.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.705,
+    "bytes": 5163,
+    "sha256": "ad20173087a8451e234e6d974717212f292706f90efc1453c93df9cf493f5f5c"
+  },
+  "sfx/hit-armor.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.444,
+    "bytes": 3334,
+    "sha256": "98f37b0d05b8102fdd0f191af9c9751952f0902a80cbe293e927d226bc69830c"
+  },
+  "sfx/hit-critical.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.653,
+    "bytes": 4797,
+    "sha256": "3b4c9dc5f2157f19c1dd817fd4168e62416dec21d75175c73985a4b1123a956e"
+  },
+  "sfx/hit-flesh.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.287,
+    "bytes": 2237,
+    "sha256": "3d45ed06ef78e89362731b8ea4aa33ce25b713c2b9298f1d2c3f3221ecd0e718"
+  },
+  "sfx/lever.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.522,
+    "bytes": 3883,
+    "sha256": "e9f0751ad9d504b37b6fb3e739296d155418b0e5fe4b6fbc0fc70286015139f1"
+  },
+  "sfx/magic-fail.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.287,
+    "bytes": 2237,
+    "sha256": "ee8973490ca34e57f447ab3a4eaa169f3877809d15d2d0eb7ef3da7ea3b3596f"
+  },
+  "sfx/magic-fire.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "18d23860e30c5c29d31f474cf40ca5b5f82063a35c450b6b410193d489f55184"
+  },
+  "sfx/magic-frost.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.888,
+    "bytes": 6443,
+    "sha256": "b4d7e12fe5055e97852e63e0c44ba1c9231ceeaea3c938cdca56be34e4eeaafa"
+  },
+  "sfx/magic-heal.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.646,
+    "bytes": 11746,
+    "sha256": "4dab6e9f9a1fb45c40121e93624d252ff488b5bfe808446293b0ccfb05134ff7"
+  },
+  "sfx/magic-lightning.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.496,
+    "bytes": 3700,
+    "sha256": "4079cee3c016e1f5d72ac30e1db9d359fc46476dfd144eedb9ad992998849dfb"
+  },
+  "sfx/magic-poison.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.679,
+    "bytes": 4980,
+    "sha256": "dae5100ebfc068a3a6f12bb0fd9334faf803b5024b3e195360648d8d0fcfc9ec"
+  },
+  "sfx/magic-spirit.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.758,
+    "bytes": 5528,
+    "sha256": "56d7bb5ce2ccff44a55e5c5343baa9952326b6770c3e6d384905ae229fc92cad"
+  },
+  "sfx/miss.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.261,
+    "bytes": 2054,
+    "sha256": "bfa930b6da9cb3cef690c9ecc33f11652edfc692017ea1a952c5c22e147c9496"
+  },
+  "sfx/monster-boss-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.862,
+    "bytes": 6260,
+    "sha256": "3eadcb1e272556a0443d4ca55a69f6f9d8dae47a228e468430c27a8bef49e967"
+  },
+  "sfx/monster-boss-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.672,
+    "bytes": 11928,
+    "sha256": "11e4eb6d5a9ad5f2fcb295f8652636a33f499e4a0b5721fba78b7bf56d169279"
+  },
+  "sfx/monster-champion-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "0aaf84929a371cc856e2df38fdf4259a791b618650ac1884a9bb84dffe7e164e"
+  },
+  "sfx/monster-champion-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "cdcfd287d00b086879142f8e04d379cd281288b731adfd856f36606e34d02d14"
+  },
+  "sfx/monster-crawler-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "1668310094ea7f87aaa1c00a55f0335239cd782c6b997650178d3c6436535a86"
+  },
+  "sfx/monster-crawler-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "3caaf9a0bf5ad13da83320a3bc85e2dbce765f7b21da5c33042b6e530d9b0164"
+  },
+  "sfx/monster-cutthroat-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "9b1c61b1924d5d72248c4befc0984faab0f676a1a3e294bc51c94f8ba2eef1b8"
+  },
+  "sfx/monster-cutthroat-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "862b17d69acd7d48ccdfe98a9531a1665ffa9b6282af80f68a3dcfc37d27c2e4"
+  },
+  "sfx/monster-golem-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "c789bb6fca4f43e57a3ce261f43b22c3b746329ac6bf9d474acd54732d7bf6cb"
+  },
+  "sfx/monster-golem-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "9e32500929e0b8968be2f9f3e47068bd89026000221780dc60071514c39bf267"
+  },
+  "sfx/monster-herald-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "007905f3fe4dbe8714568ad2bc71158e72c8c4fbdd320bf6d35f78ccb02f8724"
+  },
+  "sfx/monster-herald-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "b8289fb19019b43c76dd9109f44981a978bd3526ec6790284787d03b6f643324"
+  },
+  "sfx/monster-hound-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "dd574a7025e4a7f49a55cbd5b61d000887ecac67c5034cc3a02fc5315e4050a5"
+  },
+  "sfx/monster-hound-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "60a90dcb0a15608111f5b02f317a07538d9bcc79f1b4af260550d84f3a3914ec"
+  },
+  "sfx/monster-knight-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "a885860ecc053fb875316efb65e3b3f417a1078f667e743e2a02d7cabf8d4ac5"
+  },
+  "sfx/monster-knight-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "523fadf4967b4f70d0ad752e0d1cea3dec77c13eaa0a5c8f639be5269c2b7ea7"
+  },
+  "sfx/monster-monk-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "a512f821723901df2e3f7f2f88ab01a2b0c03b1b940effc5fd19de301bbfb8c3"
+  },
+  "sfx/monster-monk-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "cf7e3be2773a44b90f11fe5162f2496926d698ca94e594deaedc33aea6adfb7f"
+  },
+  "sfx/monster-raider-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "db32c5e1f76d5297d2ffef4da21abdb7a3aa9759743f0952b532d797f78569fc"
+  },
+  "sfx/monster-raider-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "4782b7153651382244b79164b768b494d6b0905a974febab6ccef11d395d1473"
+  },
+  "sfx/monster-sentinel-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "6cf66c5e5d0c946feef207e5b29aaebd3dc2ec3ad7a2c56920d79ebc923d99a3"
+  },
+  "sfx/monster-sentinel-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "09e6fc260ac79283fa780d2e3f73bfebf054cbb75f88453b61350059a3df203d"
+  },
+  "sfx/monster-shade-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "eb427e754ef5c2740cd8e23cdfeebdf150f6778001081b0ee15b38491e4a328e"
+  },
+  "sfx/monster-shade-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "3601640429daf0c2b197d3fb41914f5bc0d5530a451ebb868083d4fa63cf7d03"
+  },
+  "sfx/monster-stalker-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "fcc0bbe1ac9c52e1b7ddf47df0000b45bcecffc176c558772bc34d1dc1711f1f"
+  },
+  "sfx/monster-stalker-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "52df0e2b9d4e7718e0d5f0322740ab6db83b1a35f4f878fb1fd9856dbe266ae2"
+  },
+  "sfx/monster-wisp-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "ec7ad49f1ea5361928d4665a32b66d15fc8acefc0aee4ec1142aaa8ca8ef63e7"
+  },
+  "sfx/monster-wisp-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "220ee18ee175b7b0b5addb2dff89c720f258c5a99b254fe977cd7e5a87b21708"
+  },
+  "sfx/monster-wraith-attack.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.575,
+    "bytes": 4248,
+    "sha256": "0d8c35dd3a4fb2d0bb12684a2f3540c25c270ada4125019bc89c315cebb39ce3"
+  },
+  "sfx/monster-wraith-death.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 1.123,
+    "bytes": 8088,
+    "sha256": "96b2ce209027a1d56d3f2aadbf0eaca53d0a62dcb741fbf583b25c88a8678f4b"
+  },
+  "sfx/quest-complete.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 2.064,
+    "bytes": 14671,
+    "sha256": "1461fbf3d81cf0717086a47ba10b29bb86e467b01bba8aada4e668f462f9adaf"
+  },
+  "sfx/quest-update.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.914,
+    "bytes": 6626,
+    "sha256": "d2ac0d1ad5421b02eea585a545afab795dd6b6f54f274ea1600efcc44bb75332"
+  },
+  "sfx/step-crypt-1.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "012e70ab62174759263e4ca7c2c6edce9bb796d8f76b67db951d087d4a2976b4"
+  },
+  "sfx/step-crypt-2.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "997b8c5ed67e49fb8f6767417b92725679c0f028344dca4232edbdddc6454b49"
+  },
+  "sfx/step-crypt-3.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "c943e5483a7f681c1b18174ce529a54a39bbe89ffd379f113ddbfb44147c96d3"
+  },
+  "sfx/step-grass-1.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "89ebd7e203f1a282022f1bfadfffe8d40515974782e354b9f4232c2a7c6acfbd"
+  },
+  "sfx/step-grass-2.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "1573afc49ec45256d17052a5f9b6301401eea2dd28ec6fdbb736a9025c908564"
+  },
+  "sfx/step-grass-3.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "0b691cecb6b6cb96c3b362710f8d3071ce9b5e973dc55458d1d864c40c5348f6"
+  },
+  "sfx/step-stone-1.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "e76a90e8939d53579ca12ecd2bdbe077b9e05fd1ac9002b8da498ea4ce652aa9"
+  },
+  "sfx/step-stone-2.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "9c7c2fd357f34ef964df7de165ba58a08bfda9cb8336a4e3db93d81786ada4d7"
+  },
+  "sfx/step-stone-3.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "e36cfaff2cf4f92f3b51c88bd8810411024646ae0aa888c3c8c22b73926605ba"
+  },
+  "sfx/tactical-pause.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.705,
+    "bytes": 5163,
+    "sha256": "bceb4edfbf3d7759730daeaf0f94854fa647aba7fd36f98c59d26174b531f450"
+  },
+  "sfx/tactical-resume.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.705,
+    "bytes": 5163,
+    "sha256": "f50d1087ac371c99093bb6c658dbbed2856f576482083af4efee83c9cad74ac1"
+  },
+  "sfx/trap-disarm.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.784,
+    "bytes": 5711,
+    "sha256": "467b572827fc10cb73aeb592905c4e25816e199c27c0c72e527e7aebcd84cbe6"
+  },
+  "sfx/trap-trigger.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.758,
+    "bytes": 5528,
+    "sha256": "bb7bb74ad5b6287a6a5073bf1883012754400e631c2f5373fe2c39b692686873"
+  },
+  "sfx/ui-click.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.157,
+    "bytes": 1323,
+    "sha256": "28c1e9d4996b6db5878017fea31359069ee28767782991b6486e4b1a6c83613c"
+  },
+  "sfx/ui-confirm.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.287,
+    "bytes": 2237,
+    "sha256": "c3dacf30d8d3713950a1f9b12a07f558123e1ee37a68c812fd15df0086760f18"
+  },
+  "sfx/ui-error.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.235,
+    "bytes": 1871,
+    "sha256": "01e776454f56058574097747801c2f1bebf8b57d201860eb0536b82f7bf54af3"
+  },
+  "sfx/ui-page.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.209,
+    "bytes": 1688,
+    "sha256": "6f3da0d69f3b219dca799da28fbcc93240fff6d8f75783431553faf24656af1d"
+  },
+  "sfx/weapon-bow.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.313,
+    "bytes": 2420,
+    "sha256": "d1b341543512005906e227241eef112f7d2494f718022984184faae11606968b"
+  },
+  "sfx/weapon-mace.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.392,
+    "bytes": 2968,
+    "sha256": "8a4eb34613383c26aa69086371bfcae50160defc67dbe3890ec37c025e3edade"
+  },
+  "sfx/weapon-staff.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.366,
+    "bytes": 2786,
+    "sha256": "d03291ed428bb7d1d3a2448deaf9c530667127249c1efa1977f6e6ee26961bb3"
+  },
+  "sfx/weapon-sword.mp3": {
+    "codec": "mp3",
+    "channels": 1,
+    "sampleRate": 22050,
+    "duration": 0.313,
+    "bytes": 2420,
+    "sha256": "4f420a9ff3bd1d1694ea7dc8727f520f721391b2a0fc0e5ef1cec0dcfc0d1511"
+  },
+  "sfx/zone-transition.mp3": {
+    "codec": "mp3",
+    "channels": 2,
+    "sampleRate": 22050,
+    "duration": 1.306,
+    "bytes": 9368,
+    "sha256": "88539b4c7bcfba80caa578a888d9f58b9f2de8c0bf19b16cd823c7adb8a9c10e"
+  }
+}
