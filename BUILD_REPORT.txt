@@ -1,15 +1,11 @@
-Lovec vltavínů Reborn 5.2
+Lovec vltavínů Reborn 4.2
 
 Kontroly:
-- JavaScript syntax: pending external check
-- Service worker cache: v5-2
-- Brand image included: yes
-- Build size: 8962708 B
+- JavaScript syntax: OK
+- build size: 103945 B
+- lokální soubory: OK
 
-Obsah aktualizace:
-- branding Na zelené vlně
-- nové briefy s vysvětlením úkolu a důvodu
-- výraznější bossové + velké jméno nad hlavou
-- větší traktory a stromy
-- přepracované profily a jámy
-- 3D styl KD Slávie
+Změny build verze 4.2:
+- melodická hudba
+- přepracované postavy
+- detailnější lesní lokalita s písčitým podložím

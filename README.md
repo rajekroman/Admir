@@ -1,16 +1,20 @@
-# Lovec vltavínů: Na zelené vlně — Reborn 5.2
+# Lovec vltavínů: Zelená vlna — Reborn 4.2
 
-Mobilní browser hra o hledání vltavínů napříč jižními Čechami. Hlavní cíl: dojet až do KD Slávie na akci **Na zelené vlně** a před porotou složit nejlepší sbírku.
+Mobilní arkádová hra do prohlížeče.
 
-## Novinky 5.2
+## Hlavní novinky verze 4.2
 
-- brandované úvodní menu v barvách Na zelené vlně;
-- výraznější bossové s velkým jménem nad hlavou;
-- větší traktory a stromy;
-- nové 3D pojetí KD Slávie;
-- realističtější obdélníkové profily a výkopy;
-- lepší level brief s vysvětlením úkolu i motivace.
+- klidnější hudební doprovod s melodickou linkou;
+- hezčí stylizované postavy;
+- detailnější lesní pasáž v Nesměni s písčitým podložím a novými dekoracemi.
 
 ## Nasazení
 
-Obsah složky nahraj do kořene nového GitHub repozitáře a v GitHub Pages použij **GitHub Actions** nebo statické publikování z hlavní větve.
+Nahrajte rozbalený obsah této složky do kořene větve `main` v repozitáři GitHub Pages.
+
+## Ovládání
+
+- levý joystick: pohyb
+- pravé tlačítko: kontextová akce
+- tlačítko noty: zapnutí/vypnutí hudby
+- pauza: zastavení hry
