@@ -2,136 +2,186 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#070806">
-  <meta name="description" content="Kroniky Stříbrné brány — profesionálně stylizované 12bitové fantasy RPG pro prohlížeč a iPhone.">
-  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#2f0a67">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Stříbrná brána">
-  <link rel="manifest" href="manifest.webmanifest?v=4.0.1">
-  <link rel="icon" href="assets/icons/icon-192.png" sizes="192x192">
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <title>Kroniky Stříbrné brány — Full Release 4.0.1</title>
-  <link rel="stylesheet" href="styles.css?v=4.0.1">
-  <link rel="stylesheet" href="styles-final.css?v=4.0.1">
+  <meta name="apple-mobile-web-app-title" content="Lovec vltavínů">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="Mobilní arkádová výprava po jihočeských lokalitách vltavínů.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon-180.png">
+  <link rel="stylesheet" href="./style.css">
+  <title>Lovec vltavínů: Zelená vlna</title>
 </head>
 <body>
-  <main id="app" aria-label="Kroniky Stříbrné brány">
-    <section id="title-screen" class="screen screen--active" aria-labelledby="game-title">
-      <div class="title-panel retro-panel">
-        <p class="kicker">PROFESSIONAL DARK-FANTASY RPG · FULL RELEASE 4.0</p>
-        <h1 id="game-title">Kroniky<br><span>Stříbrné brány</span></h1>
-        <p class="lead">Kompletní příběhové RPG s deseti unikátními oblastmi, rozšířeným bestiářem, taktickými souboji, padesáti úkoly a devíti zakončeními.</p>
-        <div class="menu-stack">
-          <button id="new-game" class="button button--primary" type="button">Začít kampaň</button>
-          <button id="continue-game" class="button" type="button">Pokračovat</button>
-          <button id="controls-button" class="button" type="button">Ovládání</button>
-          <button id="audio-button" class="button" type="button">Zvuk</button>
-          <button id="settings-button" class="button" type="button">Obraz a přístupnost</button>
-          <button id="save-tools-button" class="button" type="button">Záloha uložené hry</button>
-          <button id="install-button" class="button hidden" type="button">Nainstalovat hru</button>
-        </div>
-        <p id="asset-status" class="asset-status" aria-live="polite">Načítám plnou distribuční verzi…</p>
-        <p class="footnote">Na telefonu hrajte na šířku. Levá část výhledu ovládá pohyb; tažení vpravo rozhlížení a krátké klepnutí útok.</p>
-        <p class="version-label">FULL RELEASE 4.0 · SAVE FORMAT 12 · PWA</p>
+<main id="app">
+  <canvas id="game" aria-label="Herní plocha"></canvas>
+
+  <section id="hud" class="hud hidden" aria-live="polite">
+    <div class="hud-topbar">
+      <div class="mission-panel">
+        <span id="missionNumber" class="mission-index">1</span>
+        <div class="mission-copy"><small id="placeLabel">CHLUM</small><strong id="objectiveLabel">Najdi 4 kameny</strong></div>
       </div>
-    </section>
-
-    <section id="game-screen" class="screen" aria-label="Herní obrazovka">
-      <div id="retro-frame">
-        <div id="viewport-shell">
-          <p id="canvas-description" class="sr-only">Kostkovaný pohled první osoby do fantasy světa.</p>
-          <canvas id="game-canvas" width="512" height="288" role="img" aria-label="Kostkovaný 3D herní obraz" aria-describedby="canvas-description" tabindex="0"></canvas>
-          <div class="pixel-dither" aria-hidden="true"></div>
-          <div id="screen-damage" class="screen-effect screen-effect--damage" aria-hidden="true"></div>
-          <div id="screen-heal" class="screen-effect screen-effect--heal" aria-hidden="true"></div>
-          <div id="screen-flash" class="screen-effect screen-effect--flash" aria-hidden="true"></div>
-          <div id="cinematic-banner" class="cinematic-banner" aria-live="polite">
-            <strong id="cinematic-banner-title"></strong>
-            <span id="cinematic-banner-text"></span>
-          </div>
-          <div id="crosshair" aria-hidden="true"></div>
-          <div id="zone-banner" aria-live="polite"></div>
-          <div id="save-indicator" class="save-indicator" aria-live="polite"></div>
-          <div id="orientation-hint" aria-live="polite">Otočte telefon na šířku.</div>
-          <div id="interaction-hint" aria-live="polite"></div>
-
-          <div id="combat-target" class="hidden retro-target" aria-live="polite">
-            <div class="combat-target__heading"><strong id="combat-target-name">—</strong><span id="combat-target-distance">—</span></div>
-            <div class="combat-target__bar"><span id="combat-target-hp"></span></div>
-            <div id="combat-target-statuses" class="status-strip"></div>
-            <div class="combat-target__meta"><span id="combat-state">KLID</span><span id="combat-recovery">PŘIPRAVEN</span></div>
-          </div>
-
-          <div id="debug-overlay" class="hidden" aria-live="polite"></div>
-          <aside id="party-panel" aria-label="Družina"></aside>
-
-          <div id="touch-layer" aria-hidden="false">
-            <div id="move-stick" class="touch-stick" aria-label="Pohyb"><div class="touch-stick__ring"></div><div class="touch-stick__knob"></div></div>
-            <div id="look-pad" aria-label="Rozhlížení"></div>
-            <div class="touch-buttons" aria-hidden="true">
-              <button id="touch-attack" type="button">Útok</button>
-              <button id="touch-interact" type="button">Použít</button>
-              <button id="touch-tactical" type="button">Taktika</button>
-              <button id="touch-spellbook" type="button">Kouzla</button>
-              <button id="touch-pause" type="button">Menu</button>
-            </div>
-          </div>
-        </div>
-
-        <footer id="hud" aria-label="Herní rozhraní">
-          <section class="hud-panel minimap-panel retro-panel" aria-label="Minimapa">
-            <span id="compass">S</span>
-            <canvas id="minimap" width="192" height="192"></canvas>
-          </section>
-
-          <nav class="hud-panel utility-panel retro-panel" aria-label="Rychlé akce">
-            <button id="attack-button" class="utility-button utility-attack" type="button" aria-label="Útok"><span class="utility-icon" aria-hidden="true"></span><small>Útok</small></button>
-            <button id="interact-button" class="utility-button" type="button" aria-label="Použít"><span class="utility-icon" aria-hidden="true"></span><small>Použít</small></button>
-            <button id="target-button" class="utility-button" type="button" aria-label="Další cíl"><span class="utility-icon" aria-hidden="true"></span><small>Cíl</small></button>
-            <button id="map-button" class="utility-button" type="button" aria-label="Mapa"><span class="utility-icon" aria-hidden="true"></span><small>Mapa</small></button>
-            <button id="rest-button" class="utility-button" type="button" aria-label="Odpočinout"><span class="utility-icon" aria-hidden="true"></span><small>Spánek</small></button>
-            <button id="pause-button" class="utility-button" type="button" aria-label="Menu"><span class="utility-icon" aria-hidden="true"></span><small>Menu</small></button>
-          </nav>
-
-          <section class="hud-panel log-panel retro-panel" aria-label="Herní informace">
-            <div id="quest-tracker" aria-live="polite"></div>
-            <div id="game-log" aria-live="polite"></div>
-            <div id="ability-hotbar" class="ability-hotbar" aria-label="Rychlá lišta schopností"></div>
-            <div class="status-row">
-              <span id="zone-name">—</span>
-              <span id="resource-status">0 zl.</span>
-              <span id="coordinates">X 0.0 · Y 0.0</span>
-            </div>
-          </section>
-
-          <section class="hud-panel quick-panel retro-panel" aria-label="Rychlý inventář">
-            <div id="quick-inventory" class="quick-inventory"></div>
-            <div class="quick-system-buttons">
-              <button id="character-button" type="button" title="Postavy">Postavy</button>
-              <button id="inventory-button" type="button" title="Inventář">Batoh</button>
-              <button id="spellbook-button" type="button" title="Kniha kouzel">Kouzla</button>
-              <button id="journal-button" type="button" title="Deník">Deník</button>
-              <button id="save-button" type="button" title="Uložit">Uložit</button>
-              <button id="display-button" type="button" title="Nastavení">Obraz</button>
-              <button id="tactical-button" type="button" title="Taktická pauza">Taktika</button>
-            </div>
-          </section>
-        </footer>
-      </div>
-    </section>
-
-    <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div id="modal-panel" class="modal__panel retro-panel">
-        <button id="modal-close" class="modal__close" type="button" aria-label="Zavřít">×</button>
-        <h2 id="modal-title"></h2>
-        <div id="modal-body"></div>
-        <div id="modal-actions"></div>
+      <div class="system-panel">
+        <div class="bag-pill" aria-label="Počet kamenů"><span>◆</span><b id="bagValue">0</b></div>
+        <button id="soundButton" class="icon-button" type="button" aria-label="Zvuk">♫</button>
+        <button id="pauseButton" class="icon-button" type="button" aria-label="Pauza">Ⅱ</button>
       </div>
     </div>
-  </main>
+    <div id="heatPill" class="danger-meter" aria-label="Pozornost hlídky">
+      <div class="danger-copy"><span>POZORNOST</span><strong id="dangerMeterText">KLID</strong></div>
+      <i><em id="heatFill"></em></i>
+    </div>
+    <div id="bossHud" class="boss-hud hidden">
+      <div><small>HROZBA</small><strong id="bossName">KRYSTALOVÝ KAREL</strong></div>
+      <i><em id="bossFill"></em></i>
+      <span id="bossPhase">STOPUJ HO</span>
+    </div>
+    <div id="dangerBanner" class="danger-banner hidden"><span>⚠</span><strong id="dangerText">VE SVĚTLE</strong></div>
+    <div id="combo" class="combo hidden">KOMBO ×2</div>
+    <div id="hint" class="hint hidden">Rozhlédni se po okolí</div>
+    <div id="toast" class="toast"></div>
+  </section>
 
-  <script type="module" src="src/main.js?v=4.0.1"></script>
+  <div id="theftAlert" class="theft-alert hidden" aria-live="assertive">
+    <small>POZOR!</small>
+    <strong>BYL JSI OKRADEN OD FEŤÁKA</strong>
+    <span>Vzácný Besednický ježek ti byl vytržen přímo z profilu. Dožeň zloděje!</span>
+  </div>
+
+  <div id="bossIntro" class="boss-intro hidden" aria-live="assertive">
+    <div class="boss-intro-line"></div>
+    <small id="bossIntroKicker">HROZBA V LOKALITĚ</small>
+    <strong id="bossIntroName">KRYSTALOVÝ KAREL</strong>
+    <span id="bossIntroText">Nenech ho zmizet se vzácným nálezem.</span>
+  </div>
+
+  <section id="controls" class="controls hidden" aria-label="Dotykové ovládání">
+    <div id="moveZone" class="move-zone"><div id="stick" class="stick"></div></div>
+    <button id="actionButton" class="action-button" type="button">
+      <span id="actionIcon">◉</span><small id="actionText">ROZHLÉDNOUT</small>
+    </button>
+  </section>
+
+  <section id="titleScreen" class="screen visible">
+    <div class="title-art" aria-hidden="true">
+      <div class="moon"></div><div class="ridge r1"></div><div class="ridge r2"></div>
+      <div class="field-lines"></div><div class="title-gem">◆</div>
+    </div>
+    <div class="title-copy">
+      <div class="title-brand"><img src="./assets/ui/na-zelene-vlne.jpg" alt="Na Zelené Vlně"></div>
+      <p class="eyebrow">JIŽNÍ ČECHY · SBÍRKA PRO VÝSTAVU</p>
+      <h1>Lovec<br>vltavínů</h1>
+      <p class="subtitle">Dostaň se na Na zelené vlně a přivez nejlepší sbírku vltavínů</p>
+      <button id="playButton" class="play-button" type="button"><span>VYRAZIT</span><small>jedním klepnutím</small></button>
+      <button id="continueButton" class="text-button hidden" type="button">Pokračovat v rozehrané výpravě</button>
+      <div class="title-tools">
+        <button id="howButton" class="text-button" type="button">Jak se hraje</button>
+        <button id="recordsButton" class="text-button" type="button">Rekordy</button>
+      </div>
+      <p class="version">v5.4 · Final Gameplay Edition</p>
+    </div>
+  </section>
+
+  <section id="briefScreen" class="screen">
+    <div class="brief-card">
+      <p id="briefKicker" class="eyebrow">LOKALITA 1 / 5</p>
+      <h2 id="briefTitle">Chlum po bouřce</h2>
+      <p id="briefText"></p>
+      <div class="brief-goal"><span>ÚKOL</span><strong id="briefGoal"></strong></div>
+      <div class="brief-why"><span>PROČ</span><p id="briefWhy"></p></div>
+      <button id="briefButton" class="primary-button" type="button">JDU NA TO</button>
+    </div>
+  </section>
+
+  <section id="digScreen" class="screen transparent">
+    <div class="dig-card">
+      <p class="eyebrow">KOPÁNÍ</p>
+      <h2 id="digTitle">Drž rytmus lopaty</h2>
+      <p id="digInfo">Klepni, když je ukazatel v zeleném poli.</p>
+      <div class="dig-meter"><div id="sweetZone"></div><div id="digMarker"></div></div>
+      <div id="digHits" class="dig-hits">◇ ◇ ◇</div>
+      <button id="digButton" class="primary-button" type="button">KOPNOUT</button>
+    </div>
+  </section>
+
+  <section id="identifyScreen" class="screen transparent">
+    <div class="identify-card">
+      <p class="eyebrow">RYCHLÉ URČENÍ</p>
+      <div id="sampleGem" class="sample-gem">◆</div>
+      <h2 id="sampleTitle">Zelený vzorek</h2>
+      <p id="sampleDescription"></p>
+      <div class="identify-buttons">
+        <button id="realButton" class="primary-button" type="button">VLTAVÍN</button>
+        <button id="glassButton" class="secondary-button" type="button">SKLO</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="dialogScreen" class="screen transparent">
+    <div class="dialog-card">
+      <div id="dialogAvatar" class="avatar">V</div>
+      <div><p id="dialogName" class="eyebrow">VÁCLAV</p><p id="dialogText"></p></div>
+      <button id="dialogButton" class="primary-button" type="button">DOBŘE</button>
+    </div>
+  </section>
+
+  <section id="perkScreen" class="screen">
+    <div class="perk-card">
+      <p class="eyebrow">VÝPRAVA SÍLÍ</p>
+      <h2>Vyber jednu výhodu</h2>
+      <div id="perkList" class="perk-list"></div>
+    </div>
+  </section>
+
+  <section id="juryScreen" class="screen">
+    <div class="jury-card">
+      <p class="eyebrow">KD SLÁVIE · NA ZELENÉ VLNĚ</p>
+      <h2>Vyber tři kameny do vitríny</h2>
+      <p>Vzácnost, stav a doložený původ rozhodnou o výsledku.</p>
+      <div id="juryList" class="jury-list"></div>
+      <div class="jury-footer"><span id="juryCount">0 / 3</span><button id="juryButton" class="primary-button" type="button" disabled>POSTAVIT VITRÍNU</button></div>
+    </div>
+  </section>
+
+  <section id="resultScreen" class="screen">
+    <div class="result-card">
+      <p id="resultKicker" class="eyebrow">VÝSLEDEK POROTY</p>
+      <h2 id="resultTitle">Výstavní uznání</h2>
+      <div class="score-ring"><strong id="resultScore">0</strong><span>BODŮ</span></div>
+      <p id="resultText"></p>
+      <div id="resultStats" class="result-stats"></div>
+      <button id="againButton" class="primary-button" type="button">NOVÁ VÝPRAVA</button>
+      <button id="resultRecordsButton" class="text-button" type="button">Zobrazit rekordy</button>
+    </div>
+  </section>
+
+  <section id="pauseScreen" class="screen transparent">
+    <div class="small-card"><p class="eyebrow">PAUZA</p><h2>Výprava čeká</h2><button id="resumeButton" class="primary-button" type="button">POKRAČOVAT</button><button id="menuButton" class="secondary-button" type="button">ULOŽIT A ODEJÍT</button></div>
+  </section>
+
+  <section id="howScreen" class="screen">
+    <div class="how-card">
+      <p class="eyebrow">JEDEN PALEC, JEDNO TLAČÍTKO</p><h2>Jak se hraje</h2>
+      <div class="how-grid">
+        <div><b>1</b><strong>Pohyb</strong><p>Táhni palcem vlevo. Na okraji joysticku běžíš automaticky.</p></div>
+        <div><b>2</b><strong>Jedna akce</strong><p>Tlačítko vpravo slouží k rozhlédnutí, kopání, sbírání, rozhovoru i zahrabání profilu.</p></div>
+        <div><b>3</b><strong>Risk</strong><p>Hluk a pohled hlídky plní červenou pozornost. Při dopadení ztratíš slabý kámen.</p></div>
+        <div><b>4</b><strong>Kombo</strong><p>Rychlé správné nálezy násobí skóre. Vzácný kus kombo prodlouží.</p></div>
+      </div>
+      <button id="closeHowButton" class="primary-button" type="button">ROZUMÍM</button>
+    </div>
+  </section>
+
+  <section id="recordsScreen" class="screen">
+    <div class="records-card"><p class="eyebrow">NEJLEPŠÍ VÝPRAVY</p><h2>Rekordy</h2><ol id="recordsList"></ol><button id="closeRecordsButton" class="primary-button" type="button">ZAVŘÍT</button></div>
+  </section>
+
+  <noscript><div class="noscript">Hra potřebuje zapnutý JavaScript.</div></noscript>
+</main>
+<script src="./game.js"></script>
 </body>
 </html>

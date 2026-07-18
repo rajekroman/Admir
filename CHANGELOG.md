@@ -1,9 +1,12 @@
-# Lovec vltavínů Reborn 5.5
+# Lovec vltavínů Reborn 5.4.1
 
-## Opravy
-- úvodní obrazovka vrácena blíž k původní verzi, nově jen s logem akce Na zelené vlně;
-- stabilizační úpravy spuštění a aktualizace service workeru;
-- v Chlumu je hráč i Václav posunutý tak, aby byli po startu hned vidět;
-- hráč je výrazněji vykreslený a čitelnější;
-- přidán jasný marker nad Václavem, dokud s ním nepromluvíš;
-- po vstupu do levelu se zobrazí cíl.
+## Kritické opravy
+
+- obnovené chybějící funkce `drawPatrol`, `drawItem` a `drawHotspot`;
+- hra už nespadne při prvním vykreslení levelu;
+- opravené vykreslení traktoru, hlídek, kamenů, dokumentů, stop a profilů;
+- opravené zavírání upozornění o krádeži bez nekonečného vytváření časovačů;
+- boss začne honičku až po přečtení upozornění;
+- přidaná kontrola, aby se boss nespustil po odchodu z Besednice;
+- pohybová stopa bosse se kreslí pouze během sprintu;
+- kužel svítilny se nezobrazuje, když je boss omráčený.

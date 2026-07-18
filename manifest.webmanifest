@@ -1,65 +1,29 @@
 {
-  "name": "Kroniky Stříbrné brány",
-  "short_name": "Stříbrná brána",
-  "description": "Plná distribuční verze profesionálně stylizovaného first-person dark-fantasy RPG s dokončitelnou kampaní.",
+  "name": "Lovec vltavínů: Na zelené vlně v5.4",
+  "short_name": "Lovec vltavínů",
+  "description": "Mobilní arkádová výprava s opravenou detekcí svítilen, hlídek a ukazatelem nebezpečí.",
   "lang": "cs",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "landscape",
-  "background_color": "#050608",
-  "theme_color": "#08090b",
-  "categories": [
-    "games",
-    "role-playing"
-  ],
+  "orientation": "any",
+  "background_color": "#7fe3bf",
+  "theme_color": "#2f0a67",
   "icons": [
     {
-      "src": "assets/icons/icon-192.png",
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "assets/icons/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
-    },
-    {
-      "src": "assets/icons/icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "id": "./?edition=4.0.1",
-  "display_override": [
-    "window-controls-overlay",
-    "standalone"
-  ],
-  "shortcuts": [
-    {
-      "name": "Spustit kampaň",
-      "short_name": "Hrát",
-      "url": "./?action=new",
-      "icons": [
-        {
-          "src": "assets/icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Pokračovat",
-      "short_name": "Pokračovat",
-      "url": "./?action=continue",
-      "icons": [
-        {
-          "src": "assets/icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
     }
   ]
 }
