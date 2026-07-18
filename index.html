@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#07120d">
+  <meta name="theme-color" content="#2f0a67">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Lovec vltavínů">
@@ -20,22 +20,44 @@
   <canvas id="game" aria-label="Herní plocha"></canvas>
 
   <section id="hud" class="hud hidden" aria-live="polite">
-    <div class="hud-top">
-      <div class="mission-pill">
-        <span id="missionNumber">1</span>
-        <div><small id="placeLabel">CHLUM</small><strong id="objectiveLabel">Najdi 4 kameny</strong></div>
+    <div class="hud-topbar">
+      <div class="mission-panel">
+        <span id="missionNumber" class="mission-index">1</span>
+        <div class="mission-copy"><small id="placeLabel">CHLUM</small><strong id="objectiveLabel">Najdi 4 kameny</strong></div>
       </div>
-      <div class="hud-right">
-        <div class="bag-pill"><span>◆</span><b id="bagValue">0</b></div>
-        <div class="heat-pill" aria-label="Pozornost hlídky"><span>!</span><i><em id="heatFill"></em></i></div>
+      <div class="system-panel">
+        <div class="bag-pill" aria-label="Počet kamenů"><span>◆</span><b id="bagValue">0</b></div>
         <button id="soundButton" class="icon-button" type="button" aria-label="Zvuk">♫</button>
         <button id="pauseButton" class="icon-button" type="button" aria-label="Pauza">Ⅱ</button>
       </div>
     </div>
+    <div id="heatPill" class="danger-meter" aria-label="Pozornost hlídky">
+      <div class="danger-copy"><span>POZORNOST</span><strong id="dangerMeterText">KLID</strong></div>
+      <i><em id="heatFill"></em></i>
+    </div>
+    <div id="bossHud" class="boss-hud hidden">
+      <div><small>HROZBA</small><strong id="bossName">KRYSTALOVÝ KAREL</strong></div>
+      <i><em id="bossFill"></em></i>
+      <span id="bossPhase">STOPUJ HO</span>
+    </div>
+    <div id="dangerBanner" class="danger-banner hidden"><span>⚠</span><strong id="dangerText">VE SVĚTLE</strong></div>
     <div id="combo" class="combo hidden">KOMBO ×2</div>
     <div id="hint" class="hint hidden">Rozhlédni se po okolí</div>
     <div id="toast" class="toast"></div>
   </section>
+
+  <div id="theftAlert" class="theft-alert hidden" aria-live="assertive">
+    <small>POZOR!</small>
+    <strong>BYL JSI OKRADEN OD FEŤÁKA</strong>
+    <span>Vzácný Besednický ježek ti byl vytržen přímo z profilu. Dožeň zloděje!</span>
+  </div>
+
+  <div id="bossIntro" class="boss-intro hidden" aria-live="assertive">
+    <div class="boss-intro-line"></div>
+    <small id="bossIntroKicker">HROZBA V LOKALITĚ</small>
+    <strong id="bossIntroName">KRYSTALOVÝ KAREL</strong>
+    <span id="bossIntroText">Nenech ho zmizet se vzácným nálezem.</span>
+  </div>
 
   <section id="controls" class="controls hidden" aria-label="Dotykové ovládání">
     <div id="moveZone" class="move-zone"><div id="stick" class="stick"></div></div>
@@ -50,16 +72,17 @@
       <div class="field-lines"></div><div class="title-gem">◆</div>
     </div>
     <div class="title-copy">
-      <p class="eyebrow">JIŽNÍ ČECHY · ARKÁDOVÁ VÝPRAVA</p>
+      <div class="title-brand"><img src="./assets/ui/na-zelene-vlne.jpg" alt="Na Zelené Vlně"></div>
+      <p class="eyebrow">JIŽNÍ ČECHY · SBÍRKA PRO VÝSTAVU</p>
       <h1>Lovec<br>vltavínů</h1>
-      <p class="subtitle">Z pole až na Zelenou vlnu</p>
+      <p class="subtitle">Dostaň se na Na zelené vlně a přivez nejlepší sbírku vltavínů</p>
       <button id="playButton" class="play-button" type="button"><span>VYRAZIT</span><small>jedním klepnutím</small></button>
       <button id="continueButton" class="text-button hidden" type="button">Pokračovat v rozehrané výpravě</button>
       <div class="title-tools">
         <button id="howButton" class="text-button" type="button">Jak se hraje</button>
         <button id="recordsButton" class="text-button" type="button">Rekordy</button>
       </div>
-      <p class="version">v4.1 · Mobile Controls Update</p>
+      <p class="version">v5.4 · Final Gameplay Edition</p>
     </div>
   </section>
 
@@ -69,6 +92,7 @@
       <h2 id="briefTitle">Chlum po bouřce</h2>
       <p id="briefText"></p>
       <div class="brief-goal"><span>ÚKOL</span><strong id="briefGoal"></strong></div>
+      <div class="brief-why"><span>PROČ</span><p id="briefWhy"></p></div>
       <button id="briefButton" class="primary-button" type="button">JDU NA TO</button>
     </div>
   </section>

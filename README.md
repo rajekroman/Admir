@@ -1,20 +1,9 @@
-# Lovec vltavínů: Zelená vlna — Reborn 4.2
+# Lovec vltavínů: Na zelené vlně — Reborn 5.4.1
 
-Mobilní arkádová hra do prohlížeče.
+Opravené vydání verze 5.4. Původní balíček 5.4 obsahoval kritickou chybu vykreslování a neměl být nasazen. Použij tento balíček.
 
-## Hlavní novinky verze 4.2
-
-- klidnější hudební doprovod s melodickou linkou;
-- hezčí stylizované postavy;
-- detailnější lesní pasáž v Nesměni s písčitým podložím a novými dekoracemi.
-
-## Nasazení
-
-Nahrajte rozbalený obsah této složky do kořene větve `main` v repozitáři GitHub Pages.
-
-## Ovládání
-
-- levý joystick: pohyb
-- pravé tlačítko: kontextová akce
-- tlačítko noty: zapnutí/vypnutí hudby
-- pauza: zastavení hry
+## Opraveno
+- všechny levely se znovu vykreslí;
+- fungují traktory, hlídky, předměty a profily;
+- upozornění o krádeži se správně zobrazí a zavře;
+- honička v Besednici nezačne pod neprůhledným upozorněním.
