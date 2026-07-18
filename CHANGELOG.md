@@ -1,18 +1,18 @@
-# Clean Rebuild 6.0
+# Lovec vltavínů Reborn 5.3
 
-Tato verze není pokračováním starého kódu. Herní engine, vykreslování, ovládání, mise, bossové i ukládání byly vytvořené znovu.
+## Opravy a pokračování bodů 2–3
 
-## Hlavní změny
+### Oprava Besednice
+- hráč je v noci výrazně lépe viditelný, už se neztrácí jen do stínu;
+- Besednice má otevřenější startovní prostor a lepší čitelnost terénu;
+- přidané pracovní lampy a další stopy v těžební ploše;
+- na začátku levelu se zobrazí stručný cíl a tip pro hledání stop.
 
-- jediný konzistentní Canvas 2D engine;
-- žádný service worker a žádná stará offline cache;
-- nový systém stavů hry a obrazovek;
-- pět samostatných levelů;
-- plně nový systém nebezpečí a světelných kuželů;
-- nová Besednice: stopy, profil, krádež, sprintující boss a návrat ježka;
-- obdélníkové 3D profily;
-- větší traktor a stromy;
-- 3D stylizace KD Slávie;
-- nové hudební stopy založené na akordových postupech, melodii a arpeggiu;
-- nové menu v barvách Na zelené vlně;
-- finále s výběrem tří kamenů a hodnocením poroty.
+### Pokračování bodu 2 — gameplay Besednice
+- přepracované obdélníkové profily / hotspoty jsou větší a čitelnější;
+- HUD v Besednici lépe ukazuje průběh: rozhlédni se → najdi stopy → vykopej profil → dostaň ježka zpět.
+
+### Pokračování bodu 3 — HUD a animace postav
+- postavy se nyní natáčejí podle směru pohybu;
+- hráč má v noci světelný halo obrys pro lepší orientaci;
+- akční tlačítko a HUD jsou o něco čitelnější a výraznější.

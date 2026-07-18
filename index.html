@@ -2,127 +2,179 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <meta name="theme-color" content="#36006f">
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#2f0a67">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Lovec vltavínů">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
-  <meta name="description" content="Mobilní arkádová hra o cestě na vltavínovou událost Na zelené vlně.">
+  <meta name="description" content="Mobilní arkádová výprava po jihočeských lokalitách vltavínů.">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-180.png">
   <link rel="stylesheet" href="./style.css">
-  <title>Lovec vltavínů: Na zelené vlně</title>
+  <title>Lovec vltavínů: Zelená vlna</title>
 </head>
 <body>
 <main id="app">
-  <canvas id="gameCanvas" aria-label="Herní plocha"></canvas>
+  <canvas id="game" aria-label="Herní plocha"></canvas>
 
-  <header id="hud" class="hud is-hidden">
-    <section class="mission-card">
-      <b id="levelNumber">1</b>
-      <div><small id="levelName">CHLUM</small><strong id="objectiveText">Promluv s Václavem</strong></div>
-    </section>
-    <section class="hud-actions">
-      <div class="collection"><span>◆</span><b id="stoneCount">0</b></div>
-      <button id="musicButton" class="icon-button" type="button" aria-label="Hudba">♫</button>
-      <button id="pauseButton" class="icon-button" type="button" aria-label="Pauza">Ⅱ</button>
-    </section>
-    <section id="dangerHud" class="danger-hud">
-      <div><small>NEBEZPEČÍ</small><strong id="dangerState">KLID</strong></div>
-      <i><em id="dangerFill"></em></i>
-    </section>
-    <section id="bossHud" class="boss-hud is-hidden">
-      <div><small>BOSS</small><strong id="bossHudName">KRYSTALOVÝ KAREL</strong><span id="bossState">UTÍKÁ</span></div>
+  <section id="hud" class="hud hidden" aria-live="polite">
+    <div class="hud-topbar">
+      <div class="mission-panel">
+        <span id="missionNumber" class="mission-index">1</span>
+        <div class="mission-copy"><small id="placeLabel">CHLUM</small><strong id="objectiveLabel">Najdi 4 kameny</strong></div>
+      </div>
+      <div class="system-panel">
+        <div class="bag-pill" aria-label="Počet kamenů"><span>◆</span><b id="bagValue">0</b></div>
+        <button id="soundButton" class="icon-button" type="button" aria-label="Zvuk">♫</button>
+        <button id="pauseButton" class="icon-button" type="button" aria-label="Pauza">Ⅱ</button>
+      </div>
+    </div>
+    <div id="heatPill" class="danger-meter" aria-label="Pozornost hlídky">
+      <div class="danger-copy"><span>POZORNOST</span><strong id="dangerMeterText">KLID</strong></div>
+      <i><em id="heatFill"></em></i>
+    </div>
+    <div id="bossHud" class="boss-hud hidden">
+      <div><small>HROZBA</small><strong id="bossName">KRYSTALOVÝ KAREL</strong></div>
       <i><em id="bossFill"></em></i>
-    </section>
-    <div id="toast" class="toast" aria-live="polite"></div>
-  </header>
-
-  <section id="controls" class="controls is-hidden" aria-label="Dotykové ovládání">
-    <div id="joystick" class="joystick"><div id="joystickKnob"></div></div>
-    <button id="actionButton" class="action-button" type="button"><span id="actionIcon">◉</span><small id="actionLabel">ROZHLÉDNOUT</small></button>
+      <span id="bossPhase">STOPUJ HO</span>
+    </div>
+    <div id="dangerBanner" class="danger-banner hidden"><span>⚠</span><strong id="dangerText">VE SVĚTLE</strong></div>
+    <div id="combo" class="combo hidden">KOMBO ×2</div>
+    <div id="hint" class="hint hidden">Rozhlédni se po okolí</div>
+    <div id="toast" class="toast"></div>
   </section>
 
-  <section id="menuScreen" class="screen menu-screen is-visible">
-    <div class="brand-panel"><img src="./assets/brand/na-zelene-vlne.jpg" alt="Na zelené vlně"></div>
-    <div class="menu-content">
-      <p class="kicker">JIŽNÍ ČECHY · CESTA SBĚRATELE</p>
+  <div id="bossIntro" class="boss-intro hidden" aria-live="assertive">
+    <div class="boss-intro-line"></div>
+    <small id="bossIntroKicker">HROZBA V LOKALITĚ</small>
+    <strong id="bossIntroName">KRYSTALOVÝ KAREL</strong>
+    <span id="bossIntroText">Nenech ho zmizet se vzácným nálezem.</span>
+  </div>
+
+  <section id="controls" class="controls hidden" aria-label="Dotykové ovládání">
+    <div id="moveZone" class="move-zone"><div id="stick" class="stick"></div></div>
+    <button id="actionButton" class="action-button" type="button">
+      <span id="actionIcon">◉</span><small id="actionText">ROZHLÉDNOUT</small>
+    </button>
+  </section>
+
+  <section id="titleScreen" class="screen visible">
+    <div class="title-art" aria-hidden="true">
+      <div class="moon"></div><div class="ridge r1"></div><div class="ridge r2"></div>
+      <div class="field-lines"></div><div class="title-gem">◆</div>
+    </div>
+    <div class="title-copy">
+      <div class="title-brand"><img src="./assets/ui/na-zelene-vlne.jpg" alt="Na Zelené Vlně"></div>
+      <p class="eyebrow">JIŽNÍ ČECHY · SBÍRKA PRO VÝSTAVU</p>
       <h1>Lovec<br>vltavínů</h1>
-      <p class="menu-goal">Projdi skutečnými typy nalezišť, sestav nejlepší kolekci a dostaň se do KD Slávie na událost <b>Na zelené vlně</b>.</p>
-      <button id="newGameButton" class="primary-button" type="button">NOVÁ VÝPRAVA</button>
-      <button id="continueButton" class="secondary-button is-hidden" type="button">POKRAČOVAT</button>
-      <button id="howToButton" class="text-button" type="button">Jak se hra ovládá</button>
-      <small class="version">Clean rebuild 6.0</small>
+      <p class="subtitle">Dostaň se na Na zelené vlně a přivez nejlepší sbírku vltavínů</p>
+      <button id="playButton" class="play-button" type="button"><span>VYRAZIT</span><small>jedním klepnutím</small></button>
+      <button id="continueButton" class="text-button hidden" type="button">Pokračovat v rozehrané výpravě</button>
+      <div class="title-tools">
+        <button id="howButton" class="text-button" type="button">Jak se hraje</button>
+        <button id="recordsButton" class="text-button" type="button">Rekordy</button>
+      </div>
+      <p class="version">v5.3 · Besednice / HUD / Animace</p>
     </div>
   </section>
 
   <section id="briefScreen" class="screen">
-    <article class="card brief-card">
-      <p id="briefKicker" class="kicker">LOKALITA 1 / 5</p>
+    <div class="brief-card">
+      <p id="briefKicker" class="eyebrow">LOKALITA 1 / 5</p>
       <h2 id="briefTitle">Chlum po bouřce</h2>
-      <p id="briefDescription"></p>
-      <div class="brief-block"><span>CO MUSÍŠ UDĚLAT</span><strong id="briefGoal"></strong></div>
-      <div class="brief-block why"><span>PROČ</span><p id="briefWhy"></p></div>
-      <button id="enterLevelButton" class="primary-button" type="button">VSTOUPIT DO LOKALITY</button>
-    </article>
+      <p id="briefText"></p>
+      <div class="brief-goal"><span>ÚKOL</span><strong id="briefGoal"></strong></div>
+      <div class="brief-why"><span>PROČ</span><p id="briefWhy"></p></div>
+      <button id="briefButton" class="primary-button" type="button">JDU NA TO</button>
+    </div>
   </section>
 
-  <section id="dialogScreen" class="screen overlay-screen">
-    <article class="card dialog-card">
-      <div id="dialogAvatar" class="avatar">V</div>
-      <div><p id="dialogName" class="kicker">VÁCLAV</p><p id="dialogText"></p></div>
-      <button id="dialogCloseButton" class="primary-button" type="button">ROZUMÍM</button>
-    </article>
-  </section>
-
-  <section id="digScreen" class="screen overlay-screen">
-    <article class="card dig-card">
-      <p class="kicker">KOPÁNÍ PROFILU</p>
-      <h2 id="digTitle">Přesné kopnutí</h2>
-      <p>Klepni, když se bílý ukazatel nachází v zeleném poli. Potřebuješ tři přesné zásahy.</p>
-      <div class="dig-meter"><i id="digSweet"></i><em id="digMarker"></em></div>
+  <section id="digScreen" class="screen transparent">
+    <div class="dig-card">
+      <p class="eyebrow">KOPÁNÍ</p>
+      <h2 id="digTitle">Drž rytmus lopaty</h2>
+      <p id="digInfo">Klepni, když je ukazatel v zeleném poli.</p>
+      <div class="dig-meter"><div id="sweetZone"></div><div id="digMarker"></div></div>
       <div id="digHits" class="dig-hits">◇ ◇ ◇</div>
       <button id="digButton" class="primary-button" type="button">KOPNOUT</button>
-    </article>
+    </div>
   </section>
 
-  <section id="identifyScreen" class="screen overlay-screen">
-    <article class="card identify-card">
-      <p class="kicker">RYCHLÉ URČENÍ</p>
-      <div id="sampleIcon" class="sample-icon">◆</div>
-      <h2 id="sampleName">Zelený vzorek</h2>
-      <p id="sampleText"></p>
-      <div class="two-buttons"><button id="moldaviteButton" class="primary-button" type="button">VLTAVÍN</button><button id="glassButton" class="secondary-button" type="button">SKLO</button></div>
-    </article>
+  <section id="identifyScreen" class="screen transparent">
+    <div class="identify-card">
+      <p class="eyebrow">RYCHLÉ URČENÍ</p>
+      <div id="sampleGem" class="sample-gem">◆</div>
+      <h2 id="sampleTitle">Zelený vzorek</h2>
+      <p id="sampleDescription"></p>
+      <div class="identify-buttons">
+        <button id="realButton" class="primary-button" type="button">VLTAVÍN</button>
+        <button id="glassButton" class="secondary-button" type="button">SKLO</button>
+      </div>
+    </div>
   </section>
 
-  <section id="theftScreen" class="screen overlay-screen theft-screen">
-    <article class="theft-card">
-      <small>POZOR!</small>
-      <h2>BYL JSI OKRADEN OD FEŤÁKA</h2>
-      <p>Krystalový Karel ti vyrval právě vykopaný Besednický ježek. Dožeň ho a třikrát ho chyť ve chvíli, kdy se po sprintu zastaví.</p>
-      <button id="theftContinueButton" class="danger-button" type="button">DOHNAT ZLODĚJE</button>
-    </article>
+  <section id="dialogScreen" class="screen transparent">
+    <div class="dialog-card">
+      <div id="dialogAvatar" class="avatar">V</div>
+      <div><p id="dialogName" class="eyebrow">VÁCLAV</p><p id="dialogText"></p></div>
+      <button id="dialogButton" class="primary-button" type="button">DOBŘE</button>
+    </div>
   </section>
 
-  <section id="pauseScreen" class="screen overlay-screen">
-    <article class="card small-card"><p class="kicker">PAUZA</p><h2>Výprava čeká</h2><button id="resumeButton" class="primary-button" type="button">POKRAČOVAT</button><button id="saveExitButton" class="secondary-button" type="button">ULOŽIT A ODEJÍT</button></article>
-  </section>
-
-  <section id="howScreen" class="screen">
-    <article class="card how-card"><p class="kicker">OVLÁDÁNÍ</p><h2>Jeden palec, jedno tlačítko</h2><div class="how-grid"><div><b>1</b><strong>Pohyb</strong><p>Táhni levým joystickem. Na jeho okraji běžíš.</p></div><div><b>2</b><strong>Akce</strong><p>Pravé tlačítko podle situace mluví, kope, sbírá, zahrabává nebo chytá bosse.</p></div><div><b>3</b><strong>Rozhlédnutí</strong><p>Mimo objekt odhalí stopy a nálezová místa v okolí.</p></div><div><b>4</b><strong>Nebezpečí</strong><p>Světelný kužel plní ukazatel. Včas z něj vyběhni.</p></div></div><button id="closeHowButton" class="primary-button" type="button">ROZUMÍM</button></article>
+  <section id="perkScreen" class="screen">
+    <div class="perk-card">
+      <p class="eyebrow">VÝPRAVA SÍLÍ</p>
+      <h2>Vyber jednu výhodu</h2>
+      <div id="perkList" class="perk-list"></div>
+    </div>
   </section>
 
   <section id="juryScreen" class="screen">
-    <article class="card jury-card"><p class="kicker">KD SLÁVIE · NA ZELENÉ VLNĚ</p><h2>Vyber tři nejlepší kameny</h2><p>Porota hodnotí vzácnost, kvalitu a doložený původ.</p><div id="juryList" class="jury-list"></div><div class="jury-footer"><strong id="juryCount">0 / 3</strong><button id="judgeButton" class="primary-button" type="button" disabled>PŘEDSTOUPIT PŘED POROTU</button></div></article>
+    <div class="jury-card">
+      <p class="eyebrow">KD SLÁVIE · NA ZELENÉ VLNĚ</p>
+      <h2>Vyber tři kameny do vitríny</h2>
+      <p>Vzácnost, stav a doložený původ rozhodnou o výsledku.</p>
+      <div id="juryList" class="jury-list"></div>
+      <div class="jury-footer"><span id="juryCount">0 / 3</span><button id="juryButton" class="primary-button" type="button" disabled>POSTAVIT VITRÍNU</button></div>
+    </div>
   </section>
 
   <section id="resultScreen" class="screen">
-    <article class="card result-card"><p class="kicker">VÝSLEDEK AKCE</p><h2 id="resultTitle">Výstavní uznání</h2><div class="score"><strong id="resultScore">0</strong><span>BODŮ</span></div><p id="resultText"></p><div id="resultStats" class="result-stats"></div><button id="restartButton" class="primary-button" type="button">NOVÁ VÝPRAVA</button></article>
+    <div class="result-card">
+      <p id="resultKicker" class="eyebrow">VÝSLEDEK POROTY</p>
+      <h2 id="resultTitle">Výstavní uznání</h2>
+      <div class="score-ring"><strong id="resultScore">0</strong><span>BODŮ</span></div>
+      <p id="resultText"></p>
+      <div id="resultStats" class="result-stats"></div>
+      <button id="againButton" class="primary-button" type="button">NOVÁ VÝPRAVA</button>
+      <button id="resultRecordsButton" class="text-button" type="button">Zobrazit rekordy</button>
+    </div>
   </section>
 
-  <div id="fatalError" class="fatal-error is-hidden"><h2>Hru se nepodařilo spustit</h2><p id="fatalText"></p><button id="reloadButton" type="button">Znovu načíst</button></div>
+  <section id="pauseScreen" class="screen transparent">
+    <div class="small-card"><p class="eyebrow">PAUZA</p><h2>Výprava čeká</h2><button id="resumeButton" class="primary-button" type="button">POKRAČOVAT</button><button id="menuButton" class="secondary-button" type="button">ULOŽIT A ODEJÍT</button></div>
+  </section>
+
+  <section id="howScreen" class="screen">
+    <div class="how-card">
+      <p class="eyebrow">JEDEN PALEC, JEDNO TLAČÍTKO</p><h2>Jak se hraje</h2>
+      <div class="how-grid">
+        <div><b>1</b><strong>Pohyb</strong><p>Táhni palcem vlevo. Na okraji joysticku běžíš automaticky.</p></div>
+        <div><b>2</b><strong>Jedna akce</strong><p>Tlačítko vpravo slouží k rozhlédnutí, kopání, sbírání, rozhovoru i zahrabání profilu.</p></div>
+        <div><b>3</b><strong>Risk</strong><p>Hluk a pohled hlídky plní červenou pozornost. Při dopadení ztratíš slabý kámen.</p></div>
+        <div><b>4</b><strong>Kombo</strong><p>Rychlé správné nálezy násobí skóre. Vzácný kus kombo prodlouží.</p></div>
+      </div>
+      <button id="closeHowButton" class="primary-button" type="button">ROZUMÍM</button>
+    </div>
+  </section>
+
+  <section id="recordsScreen" class="screen">
+    <div class="records-card"><p class="eyebrow">NEJLEPŠÍ VÝPRAVY</p><h2>Rekordy</h2><ol id="recordsList"></ol><button id="closeRecordsButton" class="primary-button" type="button">ZAVŘÍT</button></div>
+  </section>
+
+  <noscript><div class="noscript">Hra potřebuje zapnutý JavaScript.</div></noscript>
 </main>
 <script src="./game.js"></script>
 </body>

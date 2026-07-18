@@ -1,1157 +1,920 @@
 (() => {
   "use strict";
 
-  const byId = id => document.getElementById(id);
-  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-  const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-  const random = (min, max) => min + Math.random() * (max - min);
-  const choose = arr => arr[Math.floor(Math.random() * arr.length)];
-  const angleDelta = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
-  const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
-
-  const app = byId("app");
-  const canvas = byId("gameCanvas");
-  const context = canvas.getContext("2d", { alpha: false, desynchronized: true });
-
-  if (!context) throw new Error("Canvas 2D není v tomto prohlížeči dostupný.");
+  const $ = id => document.getElementById(id);
+  const canvas = $("game");
+  const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true });
+  const app = $("app");
+  const hud = $("hud");
+  const controls = $("controls");
 
   const screens = {
-    menu: byId("menuScreen"), brief: byId("briefScreen"), dialog: byId("dialogScreen"),
-    dig: byId("digScreen"), identify: byId("identifyScreen"), theft: byId("theftScreen"),
-    pause: byId("pauseScreen"), how: byId("howScreen"), jury: byId("juryScreen"), result: byId("resultScreen")
+    title: $("titleScreen"), brief: $("briefScreen"), dig: $("digScreen"), identify: $("identifyScreen"),
+    dialog: $("dialogScreen"), perk: $("perkScreen"), jury: $("juryScreen"), result: $("resultScreen"),
+    pause: $("pauseScreen"), how: $("howScreen"), records: $("recordsScreen")
   };
 
   const ui = {
-    hud: byId("hud"), controls: byId("controls"), levelNumber: byId("levelNumber"), levelName: byId("levelName"),
-    objectiveText: byId("objectiveText"), stoneCount: byId("stoneCount"), dangerHud: byId("dangerHud"),
-    dangerState: byId("dangerState"), dangerFill: byId("dangerFill"), bossHud: byId("bossHud"),
-    bossHudName: byId("bossHudName"), bossState: byId("bossState"), bossFill: byId("bossFill"),
-    toast: byId("toast"), actionButton: byId("actionButton"), actionIcon: byId("actionIcon"), actionLabel: byId("actionLabel"),
-    joystick: byId("joystick"), joystickKnob: byId("joystickKnob")
+    missionNumber: $("missionNumber"), place: $("placeLabel"), objective: $("objectiveLabel"), bag: $("bagValue"),
+    heat: $("heatFill"), heatPill: $("heatPill"), dangerBanner: $("dangerBanner"), dangerText: $("dangerText"), dangerMeterText: $("dangerMeterText"), bossHud: $("bossHud"), bossName: $("bossName"), bossFill: $("bossFill"), bossPhase: $("bossPhase"), bossIntro: $("bossIntro"), bossIntroName: $("bossIntroName"), bossIntroText: $("bossIntroText"), combo: $("combo"), hint: $("hint"), toast: $("toast"),
+    actionIcon: $("actionIcon"), actionText: $("actionText")
   };
 
-  const SAVE_KEY = "lovecVltavinuCleanV6";
-  const RECORD_KEY = "lovecVltavinuCleanRecordsV6";
-  const IS_TOUCH = navigator.maxTouchPoints > 0 || "ontouchstart" in window || matchMedia("(pointer:coarse)").matches;
-
+  const SAVE_KEY = "lovecVltavinuRebornSaveV5_2";
+  const RECORD_KEY = "lovecVltavinuRebornRecordsV5_2";
+  const LEGACY_SAVE_KEYS = ["lovecVltavinuRebornSaveV5_1","lovecVltavinuRebornSaveV5_0","lovecVltavinuRebornSaveV4_9","lovecVltavinuRebornSaveV4_8","lovecVltavinuRebornSaveV4_7","lovecVltavinuRebornSaveV4_6","lovecVltavinuRebornSaveV4_5"];
+  const isTouch = navigator.maxTouchPoints > 0 || "ontouchstart" in window || matchMedia("(pointer: coarse)").matches;
   const storage = {
-    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
-    set(key, value) { try { localStorage.setItem(key, value); return true; } catch { return false; } },
-    remove(key) { try { localStorage.removeItem(key); } catch {} }
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } },
+    remove(k) { try { localStorage.removeItem(k); } catch {} }
   };
+
+  function migrateLegacySave(){
+    if(storage.get(SAVE_KEY))return;
+    for(const key of LEGACY_SAVE_KEYS){const value=storage.get(key);if(value){storage.set(SAVE_KEY,value);break;}}
+  }
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"})[ch]);
 
   const LEVELS = [
     {
-      id: "chlum", name: "Chlum", title: "Chlum po bouřce", theme: "field", music: "field",
-      description: "Promluv s Václavem, získej souhlas a projdi otevřené rozorané pole. Po dešti jsou zelené záblesky lépe vidět, ale mezi brázdami znovu pracuje velký traktor.",
-      goal: "Získej souhlas a najdi 4 pravé vltavíny.",
-      why: "Tahle lokalita musí položit základ sbírky, kterou na konci představíš porotě v KD Slávie."
+      id: "chlum", name: "Chlum", title: "Chlum po bouřce", theme: "field",
+      text: "Promluv s Václavem, získej souhlas a projdi čerstvě rozorané pole. Najdi první pravé vltavíny, než pole znovu projede technika.",
+      why: "Bez silného začátku nebudeš mít co vystavit. Tahle lokalita má odstartovat tvou sbírku pro akci Na zelené vlně.",
+      goal: "Promluv s Václavem a odnes 4 pravé kameny.", music: "field"
     },
     {
-      id: "locenice", name: "Ločenice", title: "Písčitý borový les", theme: "sandforest", music: "meadow",
-      description: "Projdi řídký borový les se světlými písčitými valy a starými prohlubněmi. Mezi pravými kusy leží i lahvové střepy.",
-      goal: "Správně urči alespoň 5 vzorků a získej 3 pravé kusy.",
-      why: "Nejlepší sbírka není největší hromada. Musíš prokázat, že poznáš přírodní vltavín od obyčejného skla."
+      id: "locenice", name: "Ločenice", title: "Písčitá hrana", theme: "meadow",
+      text: "Projdi borový les na písčitém podloží. Vzorky vypadají podobně, ale jen část z nich jsou skutečné vltavíny.",
+      why: "Potřebuješ rozšířit sbírku o ověřené kusy. Ločenice prověří oko sběratele, ne jen rychlost pohybu.",
+      goal: "Správně urči 5 vzorků a najdi 3 pravé kusy.", music: "meadow"
     },
     {
-      id: "nesmen", name: "Nesměň", title: "Lesní profily", theme: "forest", music: "forest",
-      description: "V písčitém lese můžeš otevřít pouze čisté obdélníkové profily. Každý profil po vyzvednutí nálezu znovu zahrab.",
-      goal: "Vykopej a zahrab 3 profily.",
-      why: "Porota hodnotí také doložený a odpovědný způsob sběru. Otevřená jáma po tobě zůstat nesmí."
+      id: "nesmen", name: "Nesměň", title: "Lesní profily", theme: "forest",
+      text: "V lese jsou povolené jen čisté obdélníkové profily. Vykopej je, seber nález a po sobě vše zase pečlivě zahrab.",
+      why: "Na výstavu nestačí jen nálezy. Musíš ukázat, že umíš kopat rozumně a nenecháváš po sobě rozbité místo.",
+      goal: "Vykopej a zasyp 3 profily bez zbytečného hluku.", music: "forest"
     },
     {
-      id: "besednice", name: "Besednice", title: "Ježková těžební plocha", theme: "night", music: "night",
-      description: "Na okraji rozryté těžební plochy najdi tři stopy vedoucí k ježkovému profilu. Ve tmě hlídá terén kopáč a vzácný kus chce ukrást Krystalový Karel.",
-      goal: "Najdi 3 stopy, vykopej ježkový profil a získej kámen zpět od Karla.",
-      why: "Besednický ježek je nejsilnější kus celé výpravy a může rozhodnout hlavní cenu události Na zelené vlně."
+      id: "besednice", name: "Besednice", title: "Ježková noc", theme: "night",
+      text: "Rozrytá těžební plocha ukrývá slavný ježkový profil. Najdi stopy, odkryj profil a nenech si uniknout vzácný kus.",
+      why: "Besednický ježek může rozhodnout celou soutěž. Kdo ho donese do Slávie, má šanci na nejlepší sbírku večera.",
+      goal: "Najdi 3 stopy, vykopej ježek a dostaň ho zpět od Karla.", music: "night"
     },
     {
-      id: "malse", name: "Malše a Slávie", title: "Poslední cesta na výstavu", theme: "city", music: "city",
-      description: "Projdi nábřeží Malše, posbírej tři části dokumentace a dožeň Frantu, který utíká k výrazné budově KD Slávie.",
-      goal: "Získej dokumentaci, poraz Frantu a vstup do KD Slávie.",
-      why: "Bez dokumentů a posledního certifikátu nemůžeš před porotou obhájit původ nejlepší sbírky."
+      id: "malse", name: "Malše", title: "Příchod ke Slávii", theme: "city",
+      text: "Podél Malše se blížíš ke KD Slávie. Posbírej dokumentaci, dožeň Frantu a doraz na akci Na zelené vlně připravený.",
+      why: "Tady končí lov a začíná prezentace. Bez dokumentů a silné sbírky neuspěješ před porotou ani vystavovateli.",
+      goal: "Seber 3 složky, dožeň Frantu a vstup do KD Slávie.", music: "city"
     }
+  ];
+
+  const PERKS = [
+    { id: "boots", icon: "↟", name: "Lehké boty", text: "+12 % rychlost pohybu", max: 3 },
+    { id: "scanner", icon: "◉", name: "Bystrý rozhled", text: "větší dosah rozhlédnutí a kratší čekání", max: 3 },
+    { id: "shovel", icon: "⛏", name: "Přesná lopatka", text: "širší zelené pole při kopání", max: 3 },
+    { id: "quiet", icon: "◌", name: "Tichý postup", text: "méně pozornosti za chyby", max: 3 },
+    { id: "case", icon: "▣", name: "Pevné pouzdro", text: "při dopadení neztratíš nejlepší kus", max: 2 },
+    { id: "eye", icon: "◉", name: "Zkušené oko", text: "vyšší kvalita správně určených kusů", max: 3 }
   ];
 
   const SAMPLES = [
-    { real: true, name: "Olivový úlomek", text: "Matný leptaný povrch, nepravidelná hrana a proměnlivá průsvitnost." },
-    { real: false, name: "Lahvový střep", text: "Hladká plochá stěna, pravidelná tloušťka a ostrý průmyslový lom." },
-    { real: true, name: "Hnědozelený splash", text: "Zvlněná skulptace, různá tloušťka a přirozeně nepravidelný tvar." },
-    { real: false, name: "Zelený odlitek", text: "Stejnoměrná barva, kulaté okraje a opakující se povrch." },
-    { real: true, name: "Drobný celotvar", text: "Jemně leptaný povrch a vnitřní struktura viditelná proti světlu." },
-    { real: false, name: "Lesklé sklo", text: "Dokonale hladký lesk a nepřirozeně sytá zelená barva." }
+    { real: true, title: "Olivový úlomek", text: "Matný povrch, nepravidelné hrany a drobné podélné bubliny." },
+    { real: false, title: "Jasně zelený střep", text: "Dokonale hladký povrch, ostrý rovný lom a nepřirozeně sytá barva." },
+    { real: true, title: "Hnědozelený splash", text: "Proměnlivá barva, zvlněná skulptace a nestejná tloušťka." },
+    { real: false, title: "Lesklý odlitek", text: "Stejnoměrná barva, kulaté hrany a opakující se povrchový vzor." },
+    { real: true, title: "Drobný celotvar", text: "Přirozeně leptaný povrch a jemná průsvitnost proti světlu." },
+    { real: false, title: "Lahvové sklo", text: "Ploché stěny, pravidelná tloušťka a hladké průmyslové plochy." }
   ];
 
-  class MusicManager {
+  class AudioEngine {
     constructor() {
-      this.enabled = true;
-      this.theme = null;
-      this.audio = new Audio();
-      this.audio.loop = true;
-      this.audio.preload = "auto";
-      this.audio.playsInline = true;
-      this.audio.volume = 0.28;
-      this.context = null;
+      this.ctx = null;
+      this.master = null;
       this.sfxGain = null;
-      this.tracks = {
-        field: "./assets/audio/music/field.wav", meadow: "./assets/audio/music/meadow.wav",
-        forest: "./assets/audio/music/forest.wav", night: "./assets/audio/music/night.wav", city: "./assets/audio/music/city.wav"
+      this.enabled = true;
+      this.started = false;
+      this.theme = "field";
+      this.music = new Audio();
+      this.music.loop = true;
+      this.music.preload = "auto";
+      this.music.playsInline = true;
+      this.music.volume = .26;
+      this.targetMusicVolume = .26;
+      this.fadeTimer = 0;
+      this.musicTracks = {
+        field: "./assets/audio/music/field.wav",
+        meadow: "./assets/audio/music/meadow.wav",
+        forest: "./assets/audio/music/forest.wav",
+        night: "./assets/audio/music/night.wav",
+        city: "./assets/audio/music/city.wav"
       };
     }
-    unlock() {
-      if (!this.context) {
+    start() {
+      if (!this.ctx) {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (AC) {
-          this.context = new AC();
-          this.sfxGain = this.context.createGain();
-          this.sfxGain.gain.value = 0.45;
-          this.sfxGain.connect(this.context.destination);
+          this.ctx = new AC();
+          this.master = this.ctx.createGain();
+          this.sfxGain = this.ctx.createGain();
+          this.master.gain.value = .42;
+          this.sfxGain.gain.value = .6;
+          this.sfxGain.connect(this.master);
+          this.master.connect(this.ctx.destination);
         }
       }
-      if (this.context?.state === "suspended") this.context.resume().catch(() => {});
+      if (this.ctx?.state === "suspended") this.ctx.resume().catch(() => {});
+      this.started = true;
+      this.playMusic();
     }
     setTheme(theme) {
-      if (this.theme === theme) { this.play(); return; }
+      const changed = this.theme !== theme;
       this.theme = theme;
-      const source = this.tracks[theme];
-      if (!source) return;
-      this.audio.pause();
-      this.audio.src = source;
-      this.audio.currentTime = 0;
-      this.play();
+      if (changed && this.started) this.playMusic(true);
     }
-    play() { if (this.enabled && this.audio.src) this.audio.play().catch(() => {}); }
-    pause() { this.audio.pause(); }
-    toggle() { this.enabled = !this.enabled; if (this.enabled) this.play(); else this.pause(); return this.enabled; }
-    tone(frequency, duration = 0.12, type = "triangle", volume = 0.12, slide = 0) {
-      if (!this.enabled || !this.context || !this.sfxGain) return;
-      const now = this.context.currentTime;
-      const oscillator = this.context.createOscillator();
-      const gain = this.context.createGain();
-      oscillator.type = type;
-      oscillator.frequency.setValueAtTime(frequency, now);
-      if (slide) oscillator.frequency.exponentialRampToValueAtTime(Math.max(30, frequency + slide), now + duration);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(volume, now + 0.008);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-      oscillator.connect(gain); gain.connect(this.sfxGain); oscillator.start(now); oscillator.stop(now + duration + 0.03);
+    fadeMusic(target,duration=420,done=null){
+      clearInterval(this.fadeTimer);
+      const start=this.music.volume;const startAt=performance.now();
+      this.fadeTimer=setInterval(()=>{const p=Math.min(1,(performance.now()-startAt)/duration);this.music.volume=start+(target-start)*p;if(p>=1){clearInterval(this.fadeTimer);this.fadeTimer=0;done?.();}},24);
     }
-    noise(duration = 0.08, volume = 0.08) {
-      if (!this.enabled || !this.context || !this.sfxGain) return;
-      const length = Math.max(1, Math.floor(this.context.sampleRate * duration));
-      const buffer = this.context.createBuffer(1, length, this.context.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / length);
-      const source = this.context.createBufferSource();
-      const gain = this.context.createGain();
-      gain.gain.value = volume;
-      source.buffer = buffer; source.connect(gain); gain.connect(this.sfxGain); source.start();
+    playMusic(restart = false) {
+      const src = this.musicTracks[this.theme] || this.musicTracks.field;
+      let absolute=src;try{absolute=new URL(src,location.href).href;}catch{}
+      const change=this.music.src!==absolute;
+      const switchTrack=()=>{if(change)this.music.src=src;if(restart||change){try{this.music.currentTime=0;}catch{}}this.music.volume=0;if(this.enabled){this.music.play().then(()=>this.fadeMusic(this.targetMusicVolume,650)).catch(()=>{});}};
+      if(change&&this.music.src&&this.music.volume>.01)this.fadeMusic(0,180,switchTrack);else switchTrack();
+    }
+    pauseMusic(){clearInterval(this.fadeTimer);this.fadeTimer=0;this.music.pause();}
+    resumeMusic(){if(this.enabled&&this.started)this.playMusic(false);}
+    toggle() {
+      this.enabled = !this.enabled;
+      if (this.master && this.ctx) this.master.gain.setTargetAtTime(this.enabled ? .42 : 0, this.ctx.currentTime, .03);
+      if (this.enabled) this.playMusic();
+      else this.fadeMusic(0,160,()=>this.music.pause());
+      return this.enabled;
+    }
+    tone(freq, dur=.1, type="triangle", vol=.16, when=0, slide=0) {
+      if (!this.enabled || !this.ctx || !this.sfxGain) return;
+      const t = this.ctx.currentTime + when;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t);
+      if (slide) osc.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide), t+dur);
+      gain.gain.setValueAtTime(.0001,t);
+      gain.gain.linearRampToValueAtTime(vol,t+.008);
+      gain.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      osc.connect(gain); gain.connect(this.sfxGain); osc.start(t); osc.stop(t+dur+.03);
+    }
+    noise(dur=.08, vol=.08, cutoff=1200) {
+      if (!this.enabled || !this.ctx || !this.sfxGain) return;
+      const n=Math.floor(this.ctx.sampleRate*dur), b=this.ctx.createBuffer(1,n,this.ctx.sampleRate), d=b.getChannelData(0);
+      for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+      const src=this.ctx.createBufferSource(), filter=this.ctx.createBiquadFilter(), g=this.ctx.createGain();
+      src.buffer=b; filter.type="lowpass"; filter.frequency.value=cutoff; g.gain.value=vol;
+      src.connect(filter); filter.connect(g); g.connect(this.sfxGain); src.start();
     }
     sfx(name) {
-      this.unlock();
-      const sounds = {
-        click: () => this.tone(380, 0.05, "square", 0.04),
-        look: () => { this.tone(260, 0.2, "sine", 0.07, 330); this.tone(540, 0.18, "sine", 0.04, 180); },
-        dig: () => { this.noise(0.1, 0.1); this.tone(86, 0.12, "triangle", 0.06); },
-        good: () => { this.tone(620, 0.13, "triangle", 0.09); this.tone(930, 0.16, "sine", 0.06); },
-        rare: () => [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => this.tone(f, 0.26, "triangle", 0.075), i * 55)),
-        bad: () => { this.tone(190, 0.22, "square", 0.08, -70); this.noise(0.08, 0.06); },
-        alert: () => { this.tone(150, 0.16, "sawtooth", 0.09); this.tone(110, 0.2, "sawtooth", 0.07); },
-        hit: () => { this.noise(0.12, 0.11); this.tone(100, 0.18, "square", 0.08); },
-        win: () => [392, 494, 587, 784].forEach((f, i) => setTimeout(() => this.tone(f, 0.34, "triangle", 0.08), i * 90))
+      const f = {
+        scan:()=>{this.tone(260,.18,"sine",.08,0,420);this.tone(520,.22,"sine",.05,.08,260);},
+        dig:()=>{this.noise(.11,.13,800);this.tone(82,.12,"triangle",.06);},
+        good:()=>{this.tone(620,.12,"triangle",.11);this.tone(930,.15,"sine",.08,.07);},
+        rare:()=>[523,659,784,1047].forEach((x,i)=>this.tone(x,.25,"triangle",.08,i*.06)),
+        bad:()=>{this.tone(180,.22,"square",.07,0,-70);this.noise(.09,.08,600);},
+        catch:()=>{this.tone(95,.28,"sawtooth",.1);this.noise(.16,.13,900);},
+        paper:()=>{this.tone(420,.08,"square",.06);this.tone(620,.1,"triangle",.06,.06);},
+        win:()=>[392,494,587,784].forEach((x,i)=>this.tone(x,.36,"triangle",.1,i*.1)),
+        click:()=>this.tone(360,.05,"square",.04),
+        alert:()=>{this.tone(740,.08,"square",.055);this.tone(520,.1,"square",.045,.1);},
+        heartbeat:()=>{this.tone(66,.12,"sine",.09);this.tone(58,.11,"sine",.065,.16);},
+        boss:()=>{this.tone(98,.42,"sawtooth",.06,0,-22);this.tone(147,.36,"triangle",.055,.13);this.noise(.25,.04,520);},
+        step:()=>this.noise(.025,.025,500)
       };
-      sounds[name]?.();
+      f[name]?.();
     }
+    update() {}
+  }
+  const audio = new AudioEngine();
+
+  function freshState() {
+    return {
+      version:"5.1.0", levelIndex:0, score:0, stones:[], heat:0, combo:1, comboTimer:0, caught:0,
+      perks:{boots:0,scanner:0,shovel:0,quiet:0,case:0,eye:0}, stats:{digs:0,correct:0,misses:0,rare:0}, sound:true
+    };
   }
 
-  const music = new MusicManager();
-
+  let state = freshState();
   let mode = "menu";
-  let state = createState();
+  let viewport = {w:innerWidth,h:innerHeight,dpr:1};
   let world = null;
-  let dialogCallback = null;
+  let player = {x:0,y:0,r:17,angle:0,step:0,invuln:0};
+  let camera = {x:0,y:0};
+  let input = {x:0,y:0,pressed:false};
+  let nearest = null;
+  let last = performance.now();
+  let scanCooldown = 0;
+  let scanPulse = 0;
+  let toastTimer = 0;
   let currentDig = null;
   let currentSample = null;
   let digMarker = 0;
-  let digDirection = 1;
+  let digDir = 1;
   let digHits = 0;
-  let lookCooldown = 0;
-  let nearest = null;
-  let toastTimer = 0;
   let jurySelection = new Set();
-  let lastTime = performance.now();
-  let viewport = { width: innerWidth, height: innerHeight, dpr: 1 };
-  let camera = { x: 0, y: 0 };
+  let dialogueCallback = null;
   let shake = 0;
   let flash = 0;
   let flashColor = "255,255,255";
-  let particles = [];
-  let input = { x: 0, y: 0 };
-  let joystickPointer = null;
-  let danger = { active: false, source: "", rate: 0, exposure: 0, catchAfter: Infinity };
+  let dangerActive = false;
+  let dangerSource = "";
+  let dangerRate = 0;
+  let dangerExposure = 0;
+  let dangerCatchAfter = Infinity;
+  let dangerWarned = false;
+  let dangerBeatTimer = 0;
+  let bossIntroTimer = 0;
 
-  const player = { x: 0, y: 0, r: 18, angle: 0, step: 0, moving: false, invulnerable: 0, spawnX: 0, spawnY: 0 };
-
-  function createState() {
-    return {
-      version: 6, levelIndex: 0, score: 0, heat: 0, stones: [], caught: 0,
-      completed: {}, settings: { music: true }, startedAt: Date.now()
-    };
-  }
-
-  function showScreen(name) {
-    Object.entries(screens).forEach(([key, element]) => element?.classList.toggle("is-visible", key === name));
-  }
-
-  function setPlaying(enabled) {
-    ui.hud.classList.toggle("is-hidden", !enabled);
-    ui.controls.classList.toggle("is-hidden", !enabled || !IS_TOUCH);
-  }
-
-  function toast(message, type = "good", duration = 1500) {
-    ui.toast.textContent = message;
-    ui.toast.className = `toast show ${type}`;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { ui.toast.className = "toast"; }, duration);
-  }
-
-  function saveGame() {
-    const payload = { ...state, player: { x: player.x, y: player.y } };
-    storage.set(SAVE_KEY, JSON.stringify(payload));
-    refreshContinue();
-  }
-
-  function loadGame() {
-    const raw = storage.get(SAVE_KEY);
-    if (!raw) return false;
+  function save() { storage.set(SAVE_KEY, JSON.stringify(state)); refreshContinue(); }
+  function load() {
     try {
-      const parsed = JSON.parse(raw);
-      if (!parsed || !Array.isArray(parsed.stones)) return false;
-      state = { ...createState(), ...parsed, settings: { music: true, ...(parsed.settings || {}) } };
-      music.enabled = state.settings.music !== false;
-      return true;
+      const data=JSON.parse(storage.get(SAVE_KEY)||"null");
+      if(!data || !Array.isArray(data.stones)) return false;
+      state={...freshState(),...data,perks:{...freshState().perks,...(data.perks||{})},stats:{...freshState().stats,...(data.stats||{})}};
+      audio.enabled=state.sound!==false; return true;
     } catch { return false; }
   }
+  function refreshContinue(){ $("continueButton").classList.toggle("hidden",!storage.get(SAVE_KEY)); }
+  function getRecords(){try{return JSON.parse(storage.get(RECORD_KEY)||"[]");}catch{return[];}}
+  function addRecord(score,title){const rows=getRecords();rows.push({score,title,stones:state.stones.length,date:new Date().toISOString()});rows.sort((a,b)=>b.score-a.score);storage.set(RECORD_KEY,JSON.stringify(rows.slice(0,10)));}
 
-  function refreshContinue() { byId("continueButton").classList.toggle("is-hidden", !storage.get(SAVE_KEY)); }
+  function showOnly(screen){Object.values(screens).forEach(s=>s.classList.remove("visible"));if(screen)screen.classList.add("visible");}
+  function setPlaying(on){hud.classList.toggle("hidden",!on);controls.classList.toggle("hidden",!on||!isTouch);app.classList.toggle("playing",on);}
+  function haptic(pattern=12){try{navigator.vibrate?.(pattern);}catch{}}
+  function toast(text,type="",duration=1500){clearTimeout(toastTimer);ui.toast.textContent=text;ui.toast.className=`toast show ${type}`;toastTimer=setTimeout(()=>ui.toast.className="toast",duration);}
+  function showHint(text){ui.hint.textContent=text;ui.hint.classList.remove("hidden");}
+  function hideHint(){ui.hint.classList.add("hidden");}
 
-  function startNewGame() {
-    music.unlock(); music.sfx("click");
-    storage.remove(SAVE_KEY);
-    state = createState();
-    showBrief(0);
+  function resize(){
+    const rect=app.getBoundingClientRect();
+    const w=Math.max(1,Math.round(rect.width||document.documentElement.clientWidth||innerWidth));
+    const h=Math.max(1,Math.round(rect.height||innerHeight));
+    const native=devicePixelRatio||1;
+    const pixelBudget=isTouch?1800000:3000000;
+    const budgetDpr=Math.sqrt(pixelBudget/Math.max(1,w*h));
+    const dpr=Math.max(1,Math.min(native,2,budgetDpr));
+    viewport={w,h,dpr};
+    canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);canvas.style.width="100%";canvas.style.height="100%";
+    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=true;
   }
 
-  function continueGame() {
-    music.unlock();
-    if (!loadGame()) { startNewGame(); return; }
-    showBrief(clamp(state.levelIndex, 0, LEVELS.length - 1));
+  function addProp(type,x,y,o={}){world.props.push({type,x,y,...o});}
+  function addObstacle(x,y,w,h,o={}){world.obstacles.push({x,y,w,h,...o});}
+  function addHotspot(x,y,o={}){const profile=Boolean(o.needsFill||o.special==="hedgehog");world.hotspots.push({x,y,r:profile?42:24,w:profile?74:0,h:profile?42:0,angle:profile?rand(-.22,.22):0,revealed:Boolean(o.revealed),active:true,ttl:0,...o});}
+  function addItem(type,x,y,o={}){world.items.push({type,x,y,r:20,active:true,...o});}
+  function addPatrol(type,points,o={}){const p=points[0];world.patrols.push({type,x:p.x,y:p.y,points,index:1,speed:o.speed||80,vision:o.vision||180,angle:0,active:true,...o});}
+
+  function generateLevel(index){
+    const level=LEVELS[index];
+    world={id:level.id,theme:level.theme,w:1800,h:1200,props:[],obstacles:[],hotspots:[],items:[],patrols:[],hazards:[],particles:[],exit:null,runtime:{},rain:level.theme==="field"?1:0};
+    if(level.id==="chlum") generateChlum();
+    if(level.id==="locenice") generateLocenice();
+    if(level.id==="nesmen") generateNesmen();
+    if(level.id==="besednice") generateBesednice();
+    if(level.id==="malse") generateMalse();
+    camera.x=player.x-viewport.w/2;camera.y=player.y-viewport.h/2;nearest=null;scanCooldown=0;scanPulse=0;
+    state.heat=0;state.combo=1;state.comboTimer=0;audio.setTheme(level.music);updateHUD(true);
   }
 
-  function showBrief(index) {
-    const level = LEVELS[index];
-    state.levelIndex = index;
-    mode = "brief";
-    setPlaying(false);
-    byId("briefKicker").textContent = `LOKALITA ${index + 1} / ${LEVELS.length}`;
-    byId("briefTitle").textContent = level.title;
-    byId("briefDescription").textContent = level.description;
-    byId("briefGoal").textContent = level.goal;
-    byId("briefWhy").textContent = level.why;
-    showScreen("brief");
+  function generateChlum(){
+    world.runtime={permit:false,collected:0}; player.x=360;player.y=1070;
+    addProp("farm",135,1080,{scale:.82}); addProp("npc",280,990,{name:"Václav",avatar:"V",role:"farmer"});
+    addProp("fieldpit",520,900,{w:190,h:72,angle:-.08});
+    addProp("fieldpit",930,760,{w:245,h:88,angle:.06});
+    addProp("fieldpit",1310,610,{w:210,h:76,angle:-.12});
+    addProp("fieldpit",770,420,{w:170,h:64,angle:.1});
+    for(let i=0;i<12;i++)addProp("soilheap",rand(260,1600),rand(240,980),{scale:rand(.65,1.2)});
+    for(let i=0;i<20;i++)addProp("stubble",rand(120,1720),rand(180,1100),{scale:rand(.7,1.15)});
+    for(const p of [[500,840],[820,910],[1120,760],[1440,900],[620,480],[1040,420],[1500,500]]) addHotspot(p[0],p[1],{rarity:Math.random()<.18?"rare":"common",documented:true});
+    addItem("stone",440,690,{rarity:"common",documented:true}); addItem("stone",1250,640,{rarity:"good",documented:true});
+    addPatrol("tractor",[{x:350,y:300},{x:1570,y:300},{x:1570,y:470},{x:350,y:470}],{speed:115,vision:0,scale:1.25});
+    addPatrol("farmer",[{x:1580,y:920},{x:1480,y:650},{x:1660,y:520}],{speed:65,vision:140,requires:"permit"});
+    world.exit={x:1650,y:150,r:54,label:"Odjezd"};
   }
 
-  function enterLevel() {
-    generateLevel(state.levelIndex);
-    mode = "playing";
-    showScreen(null);
-    setPlaying(true);
-    music.unlock(); music.setTheme(LEVELS[state.levelIndex].music);
-    toast(`Cíl: ${LEVELS[state.levelIndex].goal}`, "good", 2500);
-    saveGame();
-  }
-
-  function pauseGame() {
-    if (mode !== "playing") return;
-    mode = "pause"; setPlaying(false); music.pause(); showScreen("pause");
-  }
-
-  function resumeGame() {
-    mode = "playing"; showScreen(null); setPlaying(true); music.play(); lastTime = performance.now();
-  }
-
-  function saveAndExit() {
-    saveGame(); mode = "menu"; world = null; setPlaying(false); music.pause(); showScreen("menu");
-  }
-
-  function generateLevel(index) {
-    const level = LEVELS[index];
-    world = {
-      id: level.id, theme: level.theme, width: 2200, height: 1400,
-      props: [], hotspots: [], items: [], npcs: [], patrols: [], boss: null, exit: null,
-      runtime: {}, darkness: level.id === "besednice"
-    };
-    particles = [];
-    danger = { active: false, source: "", rate: 0, exposure: 0, catchAfter: Infinity };
-    lookCooldown = 0;
-    if (level.id === "chlum") buildChlum();
-    if (level.id === "locenice") buildLocenice();
-    if (level.id === "nesmen") buildNesmen();
-    if (level.id === "besednice") buildBesednice();
-    if (level.id === "malse") buildMalse();
-    player.spawnX = player.x; player.spawnY = player.y; player.invulnerable = 1.5; player.angle = -Math.PI / 2;
-    camera.x = clamp(player.x - viewport.width / 2, 0, Math.max(0, world.width - viewport.width));
-    camera.y = clamp(player.y - viewport.height / 2, 0, Math.max(0, world.height - viewport.height));
-    updateHud();
-  }
-
-  function addProp(type, x, y, options = {}) { world.props.push({ type, x, y, scale: 1, angle: 0, ...options }); }
-  function addHotspot(x, y, options = {}) { world.hotspots.push({ x, y, active: true, revealed: false, profile: false, needsFill: false, rarity: "common", width: 86, height: 48, ...options }); }
-  function addItem(type, x, y, options = {}) { world.items.push({ type, x, y, active: true, hidden: false, ...options }); }
-  function addNpc(role, name, x, y, options = {}) { world.npcs.push({ role, name, x, y, ...options }); }
-  function addPatrol(type, path, options = {}) {
-    world.patrols.push({ type, path, pathIndex: 1, x: path[0].x, y: path[0].y, speed: 70, radius: type === "tractor" ? 54 : 22, vision: 0, halfAngle: 0.55, angle: 0, active: true, ...options });
-  }
-
-  function buildChlum() {
-    world.runtime = { permit: false, collected: 0 };
-    player.x = 340; player.y = 1190;
-    addProp("farm", 150, 1180, { scale: 1.15 });
-    addNpc("farmer", "Václav", 310, 1080);
-    [[560,1050,210,92,-.08],[980,850,255,105,.07],[1480,690,225,92,-.1],[830,480,185,78,.12]].forEach(v => addProp("fieldPit", v[0], v[1], { width:v[2], height:v[3], angle:v[4] }));
-    for (let i = 0; i < 14; i++) addProp("soilHeap", random(300, 1900), random(270, 1130), { scale: random(.75,1.35) });
-    const points = [[500,1040],[820,1110],[1120,930],[1540,1060],[660,650],[1120,560],[1740,650],[1550,410]];
-    points.forEach((p, i) => addHotspot(p[0], p[1], { rarity: i === 6 ? "rare" : i % 3 === 0 ? "good" : "common", documented: true }));
-    addPatrol("tractor", [{x:350,y:320},{x:1850,y:320},{x:1850,y:540},{x:350,y:540}], { speed: 125, radius: 66, scale: 1.5 });
-    addPatrol("farmer", [{x:1700,y:1120},{x:1550,y:890},{x:1900,y:720}], { speed: 66, vision: 160, condition: () => !world.runtime.permit });
-    world.exit = { x: 2010, y: 170, radius: 58, label: "Odjezd z Chlumu" };
-  }
-
-  function buildLocenice() {
-    world.runtime = { identified: 0, correct: 0, real: 0 };
-    player.x = 180; player.y = 1200;
-    for (let i = 0; i < 70; i++) {
-      const x = random(40, 2160), y = random(30, 1360);
-      if (Math.hypot(x - 900, y - 700) > 220) addProp("pine", x, y, { scale: random(1.05, 1.75), angle: random(-.08,.08) });
+  function generateLocenice(){
+    world.runtime={correct:0,real:0,identified:0};player.x=160;player.y=1040;
+    for(let i=0;i<58;i++){
+      const x=rand(30,1770),y=rand(30,1170);
+      if(Math.hypot(x-900,y-650)>170)addProp("realpine",x,y,{scale:rand(1.0,1.7),lean:rand(-.12,.12)});
     }
-    for (let i = 0; i < 24; i++) addProp("sandMound", random(230, 1950), random(190, 1210), { scale: random(.75,1.4), angle: random(-.25,.25) });
-    for (let i = 0; i < 12; i++) addProp("sandPit", random(320, 1880), random(220, 1160), { width: random(85,170), height: random(45,90), angle: random(-.25,.25) });
-    const samplePlan = [true,false,true,false,true,true,false,true,false,true];
-    const positions = [[430,1050],[720,1160],[990,980],[1320,1120],[1710,980],[520,650],[850,520],[1210,690],[1600,520],[1900,370]];
-    samplePlan.forEach((real, i) => addItem("sample", positions[i][0], positions[i][1], { hidden: true, sample: choose(SAMPLES.filter(s => s.real === real)) }));
-    addPatrol("farmer", [{x:430,y:270},{x:1800,y:270},{x:1800,y:760},{x:430,y:760}], { speed: 70, vision: 145 });
-    world.exit = { x: 2020, y: 150, radius: 58, label: "Lesní cesta" };
+    for(let i=0;i<18;i++)addProp("sandmound",rand(210,1580),rand(160,1080),{scale:rand(.7,1.35),angle:rand(-.25,.25)});
+    for(let i=0;i<11;i++)addProp("sandpit",rand(300,1500),rand(190,1030),{w:rand(70,150),h:rand(36,75),angle:rand(-.25,.25)});
+    for(let i=0;i<10;i++)addProp("fallenpine",rand(260,1500),rand(220,980),{scale:rand(.7,1.1),angle:rand(-.65,.65)});
+    addProp("sign",220,1010,{text:"Ločenice"});
+    const samples=[...SAMPLES,...SAMPLES].sort(()=>Math.random()-.5).slice(0,9);
+    const pts=[[420,850],[660,950],[910,820],[1210,950],[1480,820],[520,520],[840,410],[1180,560],[1510,390]];
+    samples.forEach((s,i)=>addItem("sample",pts[i][0],pts[i][1],{sample:s}));
+    addPatrol("farmer",[{x:400,y:250},{x:1500,y:250},{x:1500,y:690},{x:400,y:690}],{speed:72,vision:150});
+    world.exit={x:1650,y:150,r:54,label:"Pokračovat"};
   }
 
-  function buildNesmen() {
-    world.runtime = { permit: false, dug: 0, filled: 0, open: 0 };
-    player.x = 300; player.y = 1200;
-    addNpc("ranger", "Lesník", 310, 1080);
-    addProp("hut", 130, 1210, { scale: 1.05 });
-    for (let i = 0; i < 60; i++) addProp(i % 3 === 0 ? "pine" : "tree", random(40,2160), random(30,1360), { scale: random(1.05,1.7) });
-    for (let i = 0; i < 25; i++) addProp("fern", random(120,2050), random(130,1280), { scale: random(.8,1.25) });
-    [[620,1040],[1120,900],[1580,690],[900,430]].forEach((p, i) => addHotspot(p[0], p[1], { profile: true, needsFill: true, revealed: false, documented: true, rarity: i === 3 ? "good" : "common" }));
-    addPatrol("ranger", [{x:520,y:650},{x:960,y:300},{x:1700,y:480},{x:1570,y:1100},{x:720,y:1190}], { speed: 82, vision: 190, condition: () => !world.runtime.permit || world.runtime.open > 0 });
-    world.exit = { x: 2020, y: 150, radius: 58, label: "Lesní výjezd" };
+  function generateNesmen(){
+    world.runtime={permit:false,dug:0,filled:0,open:0};player.x=360;player.y=1050;
+    addProp("npc",290,980,{name:"Lesník",avatar:"L",role:"owner"}); addProp("hut",120,1060,{scale:.9});
+    for(let i=0;i<62;i++){const x=rand(30,1770),y=rand(30,1170);if(Math.hypot(x-900,y-650)>180)addProp("tree",x,y,{scale:rand(1.0,1.7)});}
+    for(let i=0;i<18;i++)addProp("pine",rand(40,1760),rand(40,1160),{scale:rand(.95,1.45)});
+    for(let i=0;i<24;i++)addProp("bush",rand(30,1770),rand(30,1170),{scale:rand(.6,1)});
+    for(let i=0;i<22;i++)addProp("fern",rand(80,1720),rand(90,1100),{scale:rand(.7,1.15)});
+    for(let i=0;i<30;i++)addProp("grass",rand(90,1710),rand(110,1110),{scale:rand(.7,1.25)});
+    for(let i=0;i<10;i++)addProp("stump",rand(160,1650),rand(180,1060),{scale:rand(.8,1.2)});
+    for(let i=0;i<6;i++)addProp("log",rand(220,1580),rand(210,990),{scale:rand(.8,1.2),angle:rand(-.6,.6)});
+    [[520,880],[930,860],[1290,740],[720,390]].forEach((p,i)=>addHotspot(p[0],p[1],{rarity:i===3?"good":"common",documented:true,needsFill:true,marked:true}));
+    addPatrol("ranger",[{x:420,y:560},{x:840,y:300},{x:1420,y:470},{x:1320,y:980},{x:650,y:1030}],{speed:82,vision:190});
+    world.exit={x:1650,y:150,r:54,label:"Lesní cesta"};
   }
 
-  function buildBesednice() {
-    world.runtime = { clues: 0, profileSpawned: false, stolen: false, bossDefeated: false };
-    player.x = 210; player.y = 1210;
-    for (let i = 0; i < 38; i++) {
-      const x = random(20,2180), y = random(20,1380);
-      if ((x < 300 || x > 1900 || y < 190) && Math.hypot(x-player.x,y-player.y)>230) addProp("pine", x, y, { scale: random(1.05,1.7) });
+  function generateBesednice(){
+    world.runtime={clues:0,hedgehog:false,bossStarted:false,bossHits:0,bossDefeated:false};player.x=150;player.y=1030;
+    for(let i=0;i<34;i++){
+      const x=rand(20,1780),y=rand(20,1180);
+      if(x<260||x>1550||y<190)addProp("realpine",x,y,{scale:rand(1.0,1.65),lean:rand(-.08,.08)});
     }
-    for (let i = 0; i < 19; i++) addProp("earthBank", random(320,1900), random(180,1210), { scale: random(.8,1.5), angle: random(-.28,.28) });
-    for (let i = 0; i < 14; i++) addProp("minePit", random(360,1870), random(230,1160), { width: random(90,190), height: random(50,105), angle: random(-.25,.25) });
-    addProp("excavator", 1220, 360, { scale: 1.45, angle: -.08 });
-    addProp("excavator", 520, 790, { scale: 1.05, angle: .17 });
-    addProp("workLamp", 1300, 390, { scale: 1.1 });
-    addProp("workLamp", 590, 760, { scale: 1.05 });
-    [[500,1030,"čerstvá hlína"],[1130,720,"otisk pásu bagru"],[1770,390,"zelený úlomek"]].forEach(v => addItem("clue", v[0], v[1], { hidden: true, label: v[2] }));
-    addPatrol("digger", [{x:520,y:300},{x:1820,y:340},{x:1840,y:1120},{x:650,y:1160}], { speed: 88, vision: 185 });
-    world.exit = { x: 2020, y: 150, radius: 58, label: "Výjezd z Besednice" };
+    for(let i=0;i<16;i++)addProp("earthbank",rand(250,1550),rand(180,1030),{scale:rand(.75,1.45),angle:rand(-.22,.22)});
+    for(let i=0;i<13;i++)addProp("minepit",rand(300,1500),rand(250,980),{w:rand(75,150),h:rand(40,85),angle:rand(-.25,.25)});
+    for(let i=0;i<8;i++)addProp("trackscar",rand(260,1500),rand(220,1020),{scale:rand(.8,1.3),angle:rand(-.35,.35)});
+    addProp("excavator",1040,370,{scale:1.22,angle:-.08});
+    addProp("excavator",430,690,{scale:.92,angle:.18});
+    [[440,850],[930,580],[1420,330]].forEach((p,i)=>addItem("clue",p[0],p[1],{hidden:true,label:["čerstvá hlína","otisk pásu bagru","zelený úlomek"][i]}));
+    addPatrol("digger",[{x:500,y:250},{x:1450,y:280},{x:1480,y:880},{x:640,y:930}],{speed:88,vision:175});
+    world.exit={x:1650,y:150,r:54,label:"Výjezd"};
   }
 
-  function buildMalse() {
-    world.runtime = { documents: 0, bossDefeated: false };
-    player.x = 720; player.y = 1220;
-    for (let y = 150; y < 1320; y += 150) { addProp("tree", 540, y, { scale: 1.45 }); addProp("lamp", 680, y); }
-    addProp("bridge", 350, 560, { scale: 1.1 });
-    addProp("slavia", 1790, 280, { scale: 1.28 });
-    addProp("sign", 850, 1190, { text: "Zátkovo nábřeží" });
-    [[820,980,"fotografie nálezů"],[1220,690,"souhlasy vlastníků"],[1570,470,"vážní protokol"]].forEach(v => addItem("document", v[0], v[1], { label: v[2] }));
-    addPatrol("bike", [{x:650,y:920},{x:650,y:180}], { speed: 150, radius: 25 });
-    addPatrol("car", [{x:1080,y:1240},{x:1080,y:170}], { speed: 185, radius: 31 });
-    world.exit = { x: 1830, y: 365, radius: 70, label: "Vstup do KD Slávie" };
+  function generateMalse(){
+    world.runtime={papers:0,bossStarted:false,bossHits:0,bossDefeated:false};player.x=640;player.y=1040;
+    for(let y=150;y<1100;y+=145){addProp("tree",510,y,{scale:1.38});addProp("lamp",650,y);}
+    for(let i=0;i<10;i++)addProp("plazatree",rand(1110,1710),rand(470,1030),{scale:rand(.8,1.15)});
+    addProp("bridge",330,520,{scale:1}); addProp("slavie",1460,235,{scale:1.26}); addProp("sign",780,1000,{text:"Zátkovo nábřeží"});
+    addProp("plaza",1440,400,{scale:1.0});
+    [[760,860],[1040,560],[1280,360]].forEach((p,i)=>addItem("paper",p[0],p[1],{label:["fotografie nálezů","souhlasy vlastníků","vážní protokol"][i]}));
+    addPatrol("bike",[{x:620,y:1020},{x:620,y:180}],{speed:155,vision:0});
+    addPatrol("car",[{x:970,y:1080},{x:970,y:160}],{speed:190,vision:0});
+    addPatrol("police",[{x:1180,y:980},{x:1220,y:260}],{speed:92,vision:190});
+    world.exit={x:1450,y:250,r:66,label:"KD Slávie"};
   }
 
-  function levelObjective() {
-    if (!world) return "";
-    const r = world.runtime;
-    if (world.id === "chlum") return r.permit ? `Vltavíny ${r.collected}/4` : "Promluv s Václavem";
-    if (world.id === "locenice") return `Správně ${r.correct}/5 · pravé ${r.real}/3`;
-    if (world.id === "nesmen") return r.permit ? `Profily ${r.dug}/3 · zahrabáno ${r.filled}/3` : "Promluv s lesníkem";
-    if (world.id === "besednice") {
-      if (r.bossDefeated) return "Besednický ježek je zpět";
-      if (world.boss?.active) return world.boss.mode === "tired" ? "Karel je vyčerpaný · CHYŤ HO" : "Vyhni se světlu a dožeň Karla";
-      if (r.stolen) return "Dožeň zloděje";
-      if (r.clues < 3) return `Rozhlédni se · stopy ${r.clues}/3`;
-      return "Vykopej ježkový profil";
-    }
-    if (world.id === "malse") {
-      if (world.boss?.active) return world.boss.mode === "tired" ? "Franta je vyčerpaný · CHYŤ HO" : "Dožeň Frantu";
-      return r.bossDefeated ? "Vstup do KD Slávie" : `Dokumentace ${r.documents}/3`;
-    }
+  function startNew(){
+    audio.start();audio.sfx("click");state=freshState();storage.remove(SAVE_KEY);showBrief(0);
+  }
+  function continueGame(){audio.start();if(!load()){startNew();return;}showBrief(state.levelIndex);}
+  function showBrief(index){
+    state.levelIndex=index;mode="brief";setPlaying(false);const l=LEVELS[index];
+    $("briefKicker").textContent=`LOKALITA ${index+1} / ${LEVELS.length}`;$("briefTitle").textContent=l.title;$("briefText").textContent=l.text;$("briefGoal").textContent=l.goal;const whyEl=$("briefWhy"); if(whyEl) whyEl.textContent=l.why||"Posil sbírku a pokračuj směrem do KD Slávie na akci Na zelené vlně.";
+    showOnly(screens.brief);
+  }
+  function enterLevel(){generateLevel(state.levelIndex);mode="playing";showOnly(null);setPlaying(true);audio.start();save();}
+
+  function levelGoal(){
+    const r=world.runtime;
+    if(world.id==="chlum")return r.permit?`Kameny ${r.collected}/4`:`Promluv s Václavem`;
+    if(world.id==="locenice")return `Správně ${r.correct}/5 · pravé ${r.real}/3`;
+    if(world.id==="nesmen")return r.permit?`Profily ${r.dug}/3 · zahrabáno ${r.filled}/3`:`Získej souhlas lesníka`;
+    if(world.id==="besednice")return r.bossStarted?(r.bossDefeated?"Ježek je v bezpečí":"Dostaň ježek zpět"):r.clues<3?`Stopy ${r.clues}/3`:`Vykopej ježkový profil`;
+    if(world.id==="malse")return r.bossStarted?(r.bossDefeated?"Vstup do Slávie":"Dožeň Frantu"): `Dokumenty ${r.papers}/3`;
     return "Výprava";
   }
-
-  function goalComplete() {
-    if (!world) return false;
-    const r = world.runtime;
-    if (world.id === "chlum") return r.permit && r.collected >= 4;
-    if (world.id === "locenice") return r.correct >= 5 && r.real >= 3;
-    if (world.id === "nesmen") return r.permit && r.dug >= 3 && r.filled >= 3;
-    if (world.id === "besednice") return r.bossDefeated;
-    if (world.id === "malse") return r.documents >= 3 && r.bossDefeated;
+  function goalComplete(){
+    const r=world.runtime;
+    if(world.id==="chlum")return r.permit&&r.collected>=4;
+    if(world.id==="locenice")return r.correct>=5&&r.real>=3;
+    if(world.id==="nesmen")return r.permit&&r.dug>=3&&r.filled>=3;
+    if(world.id==="besednice")return r.bossDefeated;
+    if(world.id==="malse")return r.papers>=3&&r.bossDefeated;
     return false;
   }
 
-  function updateHud() {
-    if (!world) return;
-    ui.levelNumber.textContent = state.levelIndex + 1;
-    ui.levelName.textContent = LEVELS[state.levelIndex].name.toUpperCase();
-    ui.objectiveText.textContent = levelObjective();
-    ui.stoneCount.textContent = state.stones.length;
-    ui.dangerFill.style.width = `${clamp(state.heat || 0, 0, 100)}%`;
-    const heat = state.heat || 0;
-    ui.dangerState.textContent = danger.active ? "ODHALENÍ" : heat >= 70 ? "KRITICKÉ" : heat >= 15 ? "POZOR" : "KLID";
-    ui.dangerHud.classList.toggle("warning", heat >= 15 && heat < 70);
-    ui.dangerHud.classList.toggle("critical", heat >= 70 || danger.active);
-    const boss = world.boss;
-    ui.bossHud.classList.toggle("is-hidden", !boss?.active);
-    if (boss?.active) {
-      ui.bossHudName.textContent = boss.displayName;
-      ui.bossState.textContent = boss.mode === "tired" ? "VYČERPANÝ · TEĎ" : boss.phase >= 3 ? "ZUŘIVÝ SPRINT" : "UTÍKÁ";
-      ui.bossFill.style.width = `${(boss.maxHits - boss.hits) / boss.maxHits * 100}%`;
-    }
+  function updateHUD(force=false){
+    if(!world)return;ui.missionNumber.textContent=state.levelIndex+1;ui.place.textContent=LEVELS[state.levelIndex].name.toUpperCase();ui.objective.textContent=levelGoal();
+    ui.bag.textContent=state.stones.length;ui.heat.style.width=`${clamp(state.heat,0,100)}%`;
+    ui.heatPill?.classList.toggle("detected",dangerActive);
+    ui.heatPill?.classList.toggle("warning",state.heat>=35&&state.heat<70&&!dangerActive);
+    ui.heatPill?.classList.toggle("critical",state.heat>=70);
+    if(ui.heatPill)ui.heatPill.setAttribute("aria-label",dangerActive?`${dangerSource} tě vidí. Pozornost ${Math.round(state.heat)} procent`:`Pozornost hlídky ${Math.round(state.heat)} procent`);
+    if(ui.dangerMeterText)ui.dangerMeterText.textContent=dangerActive?"ODHALENÍ":state.heat>=70?"KRITICKÉ":state.heat>=35?"POZOR":"KLID";
+    ui.dangerBanner?.classList.toggle("hidden",!dangerActive);
+    if(ui.dangerText&&dangerActive)ui.dangerText.textContent=dangerSource.toUpperCase();
+    const boss=world.rival;
+    const bossVisible=Boolean(boss?.active);
+    ui.bossHud?.classList.toggle("hidden",!bossVisible);
+    ui.bossHud?.classList.toggle("enraged",bossVisible&&boss.phase>=3);
+    if(bossVisible){const display=boss.name==="karel"?"KRYSTALOVÝ KAREL":"FETÁK FRANTA";if(ui.bossName)ui.bossName.textContent=display;if(ui.bossFill)ui.bossFill.style.width=`${clamp((boss.maxHits-boss.hits)/boss.maxHits*100,0,100)}%`;if(ui.bossPhase)ui.bossPhase.textContent=boss.phase>=3?"ZUŘIVÁ FÁZE":boss.phase===2?"ZRYCHLUJE":"STOPUJ HO";}
+    hud.classList.toggle("danger-shake",dangerActive&&state.heat>=60);app.classList.toggle("danger-state",dangerActive);
+    ui.combo.textContent=`KOMBO ×${state.combo}`;ui.combo.classList.toggle("hidden",state.combo<=1);
   }
 
-  function showDialog(name, avatar, text, callback) {
-    dialogCallback = callback || null;
-    byId("dialogName").textContent = name;
-    byId("dialogAvatar").textContent = avatar;
-    byId("dialogText").textContent = text;
-    mode = "dialog"; setPlaying(false); showScreen("dialog");
+  function playerSpeed(){return 185*(1+state.perks.boots*.12);}
+  function blocked(x,y){
+    if(x<24||y<24||x>world.w-24||y>world.h-24)return true;
+    for(const o of world.obstacles){if(x+player.r>o.x-o.w/2&&x-player.r<o.x+o.w/2&&y+player.r>o.y-o.h/2&&y-player.r<o.y+o.h/2)return true;}
+    return false;
   }
 
-  function closeDialog() {
-    const callback = dialogCallback; dialogCallback = null;
-    mode = "playing"; showScreen(null); setPlaying(true); callback?.(); updateHud(); saveGame();
+  function lookAround(){
+    if(scanCooldown>0){toast(`Znovu se můžeš rozhlédnout za ${scanCooldown.toFixed(1)} s`,"",700);return;}
+    const radius=260+state.perks.scanner*55;scanPulse=.01;scanCooldown=Math.max(2.1,5-state.perks.scanner*.7);audio.sfx("scan");state.heat=clamp(state.heat+1.5,0,100);
+    let count=0;
+    for(const h of world.hotspots){if(h.active&&dist(player,h)<=radius){h.revealed=true;h.ttl=9;count++;}}
+    for(const item of world.items){if(item.active&&item.hidden&&dist(player,item)<=radius){item.hidden=false;count++;}}
+    toast(count?`Rozhlédnutí odhalilo ${count} stop${count===1?"u":"y"}`:"Tady nic není",count?"good":"",900);
   }
 
-  function lookAround() {
-    if (lookCooldown > 0) { toast(`Rozhlédnutí za ${Math.ceil(lookCooldown)} s`, "bad", 800); return; }
-    lookCooldown = 1.2;
-    music.sfx("look");
-    let found = 0;
-    const radius = 390;
-    world.hotspots.forEach(h => { if (h.active && !h.revealed && distance(player,h) <= radius) { h.revealed = true; found++; } });
-    world.items.forEach(i => { if (i.active && i.hidden && distance(player,i) <= radius) { i.hidden = false; found++; } });
-    toast(found ? `Odhaleno objektů: ${found}` : "V okolí nic nového", found ? "good" : "bad");
-  }
-
-  function findNearest() {
-    nearest = null;
-    let best = Infinity;
-    const consider = (kind, object, maxDistance) => {
-      if (!object || object.active === false) return;
-      const d = distance(player, object);
-      if (d <= maxDistance && d < best) { best = d; nearest = { kind, object }; }
-    };
-    world.npcs.forEach(npc => consider("npc", npc, 78));
-    world.hotspots.forEach(h => { if (h.active && h.revealed) consider("hotspot", h, 82); });
-    world.items.forEach(item => { if (item.active && !item.hidden) consider(item.type === "hole" ? "hole" : "item", item, item.type === "hole" ? 94 : 70); });
-    if (world.boss?.active) consider("boss", world.boss, world.boss.mode === "tired" ? 90 : 58);
-    if (world.exit && goalComplete()) consider("exit", world.exit, 90);
-
-    const buttonMap = {
-      npc: ["!", "MLUVIT"], hotspot: ["⛏", "KOPAT"], item: ["◆", "SEBRAT"], hole: ["▨", "ZAHRABAT"],
-      boss: ["✋", world.boss?.mode === "tired" ? "CHYTIT" : "DOHNAT"], exit: ["→", "ODEJÍT"]
-    };
-    if (nearest) {
-      const [icon, label] = buttonMap[nearest.kind];
-      ui.actionIcon.textContent = icon; ui.actionLabel.textContent = label;
-      ui.actionButton.classList.add("ready");
-      ui.actionButton.classList.toggle("danger-ready", nearest.kind === "boss" && world.boss?.mode === "tired");
-    } else {
-      ui.actionIcon.textContent = "◉";
-      ui.actionLabel.textContent = lookCooldown > 0 ? String(Math.ceil(lookCooldown)) : "ROZHLÉDNOUT";
-      ui.actionButton.classList.remove("ready", "danger-ready");
-    }
-  }
-
-  function performAction() {
-    if (mode !== "playing" || !world) return;
+  function performAction(){
+    if(mode!=="playing")return;
     findNearest();
-    if (!nearest) { lookAround(); return; }
-    const { kind, object } = nearest;
-    if (kind === "npc") interactNpc(object);
-    else if (kind === "hotspot") startDig(object);
-    else if (kind === "item") collectItem(object);
-    else if (kind === "hole") fillHole(object);
-    else if (kind === "boss") hitBoss();
-    else if (kind === "exit") finishLevel();
+    if(nearest){
+      if(nearest.kind==="npc")talkNpc(nearest.ref);
+      else if(nearest.kind==="hotspot")startDig(nearest.ref);
+      else if(nearest.kind==="item")interactItem(nearest.ref);
+      else if(nearest.kind==="hole")fillHole(nearest.ref);
+      else if(nearest.kind==="rival")hitRival();
+      else if(nearest.kind==="exit")tryExit();
+    }else lookAround();
   }
 
-  function interactNpc(npc) {
-    if (npc.role === "farmer") {
-      showDialog("VÁCLAV", "V", "Na poli můžeš hledat, ale drž se dál od traktoru a nenechávej po sobě nepořádek.", () => { world.runtime.permit = true; toast("Souhlas získán", "good"); });
-    } else {
-      showDialog("LESNÍK", "L", "Otevři jen malé obdélníkové profily a každý po vyzvednutí nálezu znovu zahrab.", () => { world.runtime.permit = true; world.hotspots.forEach(h => h.revealed = true); toast("Profily povoleny", "good"); });
+  function talkNpc(npc){
+    if(world.id==="chlum"&&!world.runtime.permit){showDialog("Václav","V","Sbírej jen v holých brázdách a před odjezdem nic nerozjeď. Pak jsme domluvení.",()=>{world.runtime.permit=true;npc.used=true;toast("Souhlas získán","good");});return;}
+    if(world.id==="nesmen"&&!world.runtime.permit){showDialog("Lesník","L","Tři obdélníkové profily jsou povolené. Každý po prohlédnutí hned zahrab.",()=>{world.runtime.permit=true;npc.used=true;toast("Profily jsou povolené","good");});return;}
+    showDialog(npc.name,npc.avatar,"Drž se úkolu a sleduj okolí.");
+  }
+  function showDialog(name,avatar,text,callback=null){mode="dialog";setPlaying(false);$("dialogName").textContent=name.toUpperCase();$("dialogAvatar").textContent=avatar;$("dialogText").textContent=text;dialogueCallback=callback;showOnly(screens.dialog);}
+  function closeDialog(){screens.dialog.classList.remove("visible");dialogueCallback?.();dialogueCallback=null;mode="playing";setPlaying(true);updateHUD(true);}
+
+  function startDig(h){
+    if(!h.active)return;if(world.id==="chlum"&&!world.runtime.permit){state.heat=clamp(state.heat+15,0,100);toast("Nejdřív získej souhlas","bad");return;}
+    currentDig=h;digMarker=Math.random();digDir=Math.random()<.5?-1:1;digHits=0;mode="dig";setPlaying(false);$("digHits").textContent="◇ ◇ ◇";$("digTitle").textContent=h.special==="hedgehog"?"Ježkový profil":"Drž rytmus lopaty";
+    const width=18+state.perks.shovel*6;$("sweetZone").style.left=`${50-width/2}%`;$("sweetZone").style.width=`${width}%`;showOnly(screens.dig);
+  }
+  function digAttempt(){
+    if(mode!=="dig")return;audio.sfx("dig");const width=.18+state.perks.shovel*.06;const good=Math.abs(digMarker-.5)<=width/2;
+    if(good){shake=Math.max(shake,2.5);digHits++;audio.sfx("good");$("digHits").textContent=[0,1,2].map(i=>i<digHits?"◆":"◇").join(" ");if(digHits>=3)setTimeout(finishDig,160);}
+    else{shake=Math.max(shake,7);flash=.12;flashColor="255,105,96";state.stats.misses++;state.heat=clamp(state.heat+Math.max(4,10-state.perks.quiet*2),0,100);audio.sfx("bad");toast("Hlučný úder","bad",650);}
+  }
+  function finishDig(){
+    if(!currentDig)return;const h=currentDig;h.active=false;state.stats.digs++;screens.dig.classList.remove("visible");mode="playing";setPlaying(true);
+    if(h.needsFill){
+      world.runtime.dug++;
+      world.runtime.open=(world.runtime.open||0)+1;
+      const hole={type:"hole",x:h.x,y:h.y,r:46,w:h.w||74,h:h.h||42,angle:h.angle||0,active:true};
+      world.items.push(hole);
+      nearest={kind:"hole",ref:hole,x:hole.x,y:hole.y};
+      toast("Profil je otevřený – klepni ZAHRABAT","bad",1700);
+    }
+    if(h.special==="hedgehog"){
+      world.runtime.hedgehog=true;startRival("karel",h.x+120,h.y-80);toast("Ježek! Karel ho bere!","rare",1800);audio.sfx("rare");
+    }else{
+      const stone=makeStone(LEVELS[state.levelIndex].name,h.rarity||"common",h.documented!==false);addStone(stone,h.x,h.y);
+      if(world.id==="chlum")world.runtime.collected++;
+    }
+    currentDig=null;findNearest();updateHUD(true);
+  }
+
+  function makeStone(locality,rarity="common",documented=true,qualityBonus=0){
+    const bases={common:[.5,1.8],good:[1.5,3.8],rare:[3.2,7.2],hedgehog:[5.5,10.5]};const b=bases[rarity]||bases.common;
+    const weight=+rand(b[0],b[1]).toFixed(2);const quality=clamp(Math.round(rand(58,92)+qualityBonus+state.perks.eye*2),45,100);
+    const names={common:"Drobný vltavín",good:"Olivový splash",rare:"Výstavní celotvar",hedgehog:"Besednický ježek"};
+    return{id:`s${Date.now()}${Math.random()}`,locality,rarity,weight,quality,documented,name:names[rarity],value:Math.round(weight*(rarity==="hedgehog"?4200:rarity==="rare"?1900:rarity==="good"?900:420)*(quality/75))};
+  }
+  function addStone(stone,x=player.x,y=player.y){
+    state.stones.push(stone);state.stats.rare+=stone.rarity==="rare"||stone.rarity==="hedgehog"?1:0;
+    const mult=stone.rarity==="hedgehog"?6:stone.rarity==="rare"?3:stone.rarity==="good"?1.6:1;state.score+=Math.round(stone.value*.18*state.combo*mult);
+    boostCombo(stone.rarity==="rare"||stone.rarity==="hedgehog"?2:1);burst(x,y,stone.rarity==="rare"||stone.rarity==="hedgehog"?"#f2cb72":"#63e49b",stone.rarity==="hedgehog"?28:15);
+    if(stone.rarity==="rare"||stone.rarity==="hedgehog"){shake=Math.max(shake,6);flash=.16;flashColor="242,203,114";haptic([20,35,30]);}audio.sfx(stone.rarity==="rare"||stone.rarity==="hedgehog"?"rare":"good");toast(`${stone.name} · ${stone.weight.toFixed(2)} g`,stone.rarity==="rare"||stone.rarity==="hedgehog"?"rare":"good",1300);
+  }
+  function boostCombo(amount=1){state.combo=clamp(state.combo+amount,1,6);state.comboTimer=12;}
+  function breakCombo(){state.combo=1;state.comboTimer=0;}
+
+  function interactItem(item){
+    if(!item.active)return;
+    if(item.type==="stone"){
+      item.active=false;const stone=makeStone(LEVELS[state.levelIndex].name,item.rarity||"common",item.documented!==false);addStone(stone,item.x,item.y);if(world.id==="chlum")world.runtime.collected++;return;
+    }
+    if(item.type==="sample"){currentSample=item;mode="identify";setPlaying(false);$("sampleTitle").textContent=item.sample.title;$("sampleDescription").textContent=item.sample.text;$("sampleGem").style.color=item.sample.real?"#70d999":"#33f48b";showOnly(screens.identify);return;}
+    if(item.type==="clue"){
+      item.active=false;world.runtime.clues++;audio.sfx("paper");toast(`Stopa: ${item.label}`,"good");boostCombo();if(world.runtime.clues>=3){addHotspot(980,520,{rarity:"hedgehog",documented:true,special:"hedgehog",revealed:true,marked:true});toast("Ježkový profil odhalen","rare",1700);}return;
+    }
+    if(item.type==="paper"){
+      item.active=false;world.runtime.papers++;audio.sfx("paper");toast(`Nalezena: ${item.label}`,"good");boostCombo();if(world.runtime.papers>=3&&!world.runtime.bossStarted){setTimeout(()=>startRival("franta",1120,300),450);}return;
+    }
+  }
+  function resolveSample(choice){
+    if(!currentSample)return;const correct=choice===currentSample.sample.real;currentSample.active=false;world.runtime.identified++;screens.identify.classList.remove("visible");mode="playing";setPlaying(true);
+    if(correct){world.runtime.correct++;state.stats.correct++;boostCombo();state.score+=220*state.combo;audio.sfx("good");toast("Správně","good");if(currentSample.sample.real){world.runtime.real++;addStone(makeStone("Ločenice",Math.random()<.2?"good":"common",true,state.perks.eye*3),currentSample.x,currentSample.y);}}
+    else{state.heat=clamp(state.heat+12-state.perks.quiet*2,0,100);breakCombo();audio.sfx("bad");toast("Špatné určení","bad");}
+    currentSample=null;updateHUD(true);
+  }
+
+  function fillHole(hole){
+    if(!hole||!hole.active)return;
+    hole.active=false;
+    world.runtime.filled++;
+    world.runtime.open=Math.max(0,(world.runtime.open||0)-1);
+    state.score+=160*state.combo;
+    boostCombo();
+    audio.sfx("dig");
+    burst(hole.x,hole.y,"#9a744c",12);
+    toast("Profil zahrabán","good");
+    nearest=null;
+    findNearest();
+    updateHUD(true);
+    save();
+  }
+
+  function startRival(name,x,y){
+    world.runtime.bossStarted=true;
+    world.rival={name,displayName:name==="karel"?"KRYSTALOVÝ KAREL":"FETÁK FRANTA",x,y,r:30,hits:0,maxHits:name==="karel"?3:2,speed:name==="karel"?150:166,baseSpeed:name==="karel"?150:166,angle:0,target:{x:rand(250,1550),y:rand(220,950)},throwTimer:1.15,active:true,flashlight:name==="karel",vision:name==="karel"?245:0,baseVision:name==="karel"?245:0,halfAngle:name==="karel"?.5:0,seesPlayer:false,phase:1,hitFlash:0};
+    bossIntroTimer=2.35;
+    const isKarel=name==="karel";
+    if(ui.bossIntroName)ui.bossIntroName.textContent=isKarel?"KRYSTALOVÝ KAREL":"FETÁK FRANTA";
+    if(ui.bossIntroText)ui.bossIntroText.textContent=isKarel?"Světlem si hlídá cestu a utíká s ježkem.":"Má poslední certifikát a míří ke Slávii.";
+    ui.bossIntro?.classList.remove("hidden");ui.bossIntro?.classList.add("show");
+    audio.sfx("boss");haptic([35,40,35]);shake=Math.max(shake,7);flash=.1;flashColor="190,100,75";
+    toast(isKarel?"Krystalový Karel utíká s ježkem!":"Franta bere poslední certifikát!","bad",1900);
+  }
+  function hitRival(){
+    const r=world.rival;if(!r||!r.active)return;
+    r.hits++;r.hitFlash=.28;r.phase=Math.min(3,r.hits+1);audio.sfx("catch");burst(r.x,r.y,"#ff8a72",22);shake=Math.max(shake,7);
+    r.speed=r.baseSpeed*(1+r.hits*.16);if(r.flashlight){r.vision=r.baseVision+r.hits*34;r.halfAngle=.5+r.hits*.08;}
+    r.throwTimer=Math.max(.55,1.12-r.hits*.17);r.target={x:rand(180,1620),y:rand(160,1020)};
+    if(r.hits>=r.maxHits){r.active=false;world.runtime.bossDefeated=true;state.stats.rare++;ui.bossHud?.classList.add("hidden");if(r.name==="karel")addStone(makeStone("Besednice","hedgehog",true,8),r.x,r.y);else{state.score+=1800;toast("Certifikát je zpět","rare");audio.sfx("win");}}
+    else toast(`Zásah ${r.hits}/${r.maxHits} · boss zrychluje`,"good",900);
+  }
+
+  function tryExit(){if(!goalComplete()){toast(levelGoal(),"bad");return;}finishLevel();}
+  function finishLevel(){
+    mode="transition";setPlaying(false);state.score+=700+state.combo*120;save();
+    if(state.levelIndex>=LEVELS.length-1){showJury();return;}
+    showPerks();
+  }
+  function showPerks(){
+    const candidates=PERKS.filter(p=>(state.perks[p.id]||0)<p.max).sort(()=>Math.random()-.5).slice(0,3);const list=$("perkList");list.innerHTML="";
+    candidates.forEach(p=>{const b=document.createElement("button");b.type="button";b.className="perk-option";b.innerHTML=`<b>${p.icon}</b><span><strong>${p.name}</strong><small>${p.text}</small></span>`;b.addEventListener("click",()=>{audio.sfx("click");state.perks[p.id]++;state.levelIndex++;save();showBrief(state.levelIndex);});list.append(b);});
+    showOnly(screens.perk);
+  }
+
+  function showJury(){mode="jury";jurySelection.clear();setPlaying(false);const list=$("juryList");list.innerHTML="";
+    [...state.stones].sort((a,b)=>b.value-a.value).forEach(s=>{const b=document.createElement("button");b.type="button";b.className="stone-card";b.innerHTML=`<span>◆</span><div><strong>${escapeHtml(s.name)}</strong><small>${escapeHtml(s.locality)} · ${s.weight.toFixed(2)} g · stav ${s.quality}%${s.documented?" · doložený":""}</small></div>`;b.addEventListener("click",()=>{if(jurySelection.has(s.id)){jurySelection.delete(s.id);b.classList.remove("selected");}else if(jurySelection.size<3){jurySelection.add(s.id);b.classList.add("selected");}$("juryCount").textContent=`${jurySelection.size} / 3`;$("juryButton").disabled=jurySelection.size!==3;});list.append(b);});
+    $("juryCount").textContent="0 / 3";$("juryButton").disabled=true;showOnly(screens.jury);
+  }
+  function judge(){
+    const chosen=state.stones.filter(s=>jurySelection.has(s.id));let jury=0;for(const s of chosen){jury+=s.value*.45+s.quality*18+(s.documented?700:0)+(s.rarity==="hedgehog"?3800:s.rarity==="rare"?1700:s.rarity==="good"?500:100);}jury=Math.round(jury+state.score+Math.max(0,100-state.caught*12)*18);
+    let title="Sbírka byla přijata",text="Výprava dorazila do Slávie a našla své místo mezi vystavovateli.";
+    if(jury>=25000){title="Hlavní cena Zelené vlny";text="Pestrá, doložená a dobře zvolená kolekce získala hlavní ocenění večera.";}
+    else if(jury>=17500){title="Výstavní uznání";text="Porota ocenila kvalitu kamenů i cestu napříč jihočeskými lokalitami.";}
+    state.score=jury;addRecord(jury,title);storage.remove(SAVE_KEY);audio.sfx("win");
+    $("resultTitle").textContent=title;$("resultScore").textContent=jury.toLocaleString("cs-CZ");$("resultText").textContent=text;
+    $("resultStats").innerHTML=`<div><span>KAMENY</span><strong>${state.stones.length}</strong></div><div><span>VZÁCNÉ</span><strong>${state.stats.rare}</strong></div><div><span>DOPADENÍ</span><strong>${state.caught}</strong></div>`;showOnly(screens.result);mode="result";
+  }
+
+  function caught(reason){
+    if(player.invuln>0)return;dangerActive=false;dangerExposure=0;dangerWarned=false;player.invuln=2;shake=12;flash=.22;flashColor="255,90,80";state.caught++;state.heat=20;breakCombo();audio.sfx("catch");
+    let lost=null;if(state.stones.length){const sorted=[...state.stones].sort((a,b)=>a.value-b.value);lost=state.perks.case>0&&sorted.length>1?sorted[0]:pick(sorted.slice(0,Math.min(2,sorted.length)));state.stones=state.stones.filter(s=>s.id!==lost.id);}
+    player.x=world.id==="malse"?640:world.id==="chlum"?360:world.id==="nesmen"?360:170;player.y=world.id==="malse"?1040:world.id==="chlum"?1070:world.id==="nesmen"?1050:1030;toast(`${reason}${lost?` · ztracen ${lost.name}`:""}`,"bad",1800);updateHUD(true);
+  }
+
+  function angleDistance(a,b){return Math.abs(Math.atan2(Math.sin(a-b),Math.cos(a-b)));}
+  function insideVisionCone(observer,vision,halfAngle=.57){
+    if(!observer||!vision)return false;
+    const vx=player.x-observer.x,vy=player.y-observer.y;
+    const distance=Math.hypot(vx,vy);
+    if(distance>vision+player.r)return false;
+    if(distance<1)return true;
+    return angleDistance(Math.atan2(vy,vx),observer.angle)<=halfAngle;
+  }
+  function markDanger(source,rate=42,catchAfter=2.25){
+    dangerActive=true;
+    dangerSource=source;
+    dangerRate=Math.max(dangerRate,rate);
+    dangerCatchAfter=Math.min(dangerCatchAfter,catchAfter);
+  }
+  function resolveDanger(dt){
+    if(dangerActive){
+      dangerExposure+=dt;
+      state.heat=clamp(state.heat+dangerRate*dt,0,100);
+      if(!dangerWarned){dangerWarned=true;audio.sfx("alert");haptic(22);toast(`${dangerSource}: jsi ve světle!`,"bad",900);}
+      if(dangerExposure>=dangerCatchAfter){caught(`${dangerSource} tě odhalil`);}
+    }else{
+      dangerExposure=Math.max(0,dangerExposure-dt*2.8);
+      state.heat=Math.max(0,state.heat-dt*4.2);
+      if(dangerExposure<=.05)dangerWarned=false;
     }
   }
 
-  function startDig(hotspot) {
-    if (world.id === "chlum" && !world.runtime.permit) { toast("Nejdřív promluv s Václavem", "bad"); return; }
-    if (world.id === "nesmen" && !world.runtime.permit) { toast("Nejdřív promluv s lesníkem", "bad"); return; }
-    currentDig = hotspot;
-    digHits = 0; digMarker = random(.05,.95); digDirection = Math.random() < .5 ? 1 : -1;
-    byId("digHits").textContent = "◇ ◇ ◇";
-    byId("digTitle").textContent = hotspot.special === "hedgehog" ? "Ježkový profil" : hotspot.profile ? "Obdélníkový profil" : "Nálezové místo";
-    mode = "dig"; setPlaying(false); showScreen("dig");
+  function update(dt){
+    audio.update(dt,mode==="playing");
+    if(mode==="dig"){digMarker+=digDir*dt*1.4;if(digMarker>=1){digMarker=1;digDir=-1;}if(digMarker<=0){digMarker=0;digDir=1;}$("digMarker").style.left=`calc(${digMarker*100}% - 5px)`;return;}
+    if(mode!=="playing"||!world)return;
+    scanCooldown=Math.max(0,scanCooldown-dt);player.invuln=Math.max(0,player.invuln-dt);shake=Math.max(0,shake-dt*24);flash=Math.max(0,flash-dt*.9);dangerActive=false;dangerSource="";dangerRate=0;dangerCatchAfter=Infinity;bossIntroTimer=Math.max(0,bossIntroTimer-dt);if(bossIntroTimer<=0){ui.bossIntro?.classList.remove("show");ui.bossIntro?.classList.add("hidden");}dangerBeatTimer=Math.max(0,dangerBeatTimer-dt);state.comboTimer=Math.max(0,state.comboTimer-dt);if(state.comboTimer<=0&&state.combo>1){state.combo--;state.comboTimer=5;}
+    const len=Math.hypot(input.x,input.y);if(len>.04){const nx=input.x/Math.max(1,len),ny=input.y/Math.max(1,len);const speed=playerSpeed()*(len>.78?1.28:1);const x=player.x+nx*speed*dt,y=player.y+ny*speed*dt;if(!blocked(x,player.y))player.x=x;if(!blocked(player.x,y))player.y=y;player.angle=Math.atan2(ny,nx);player.step+=dt*(len>.78?13:9);if(Math.floor(player.step*2)%4===0&&Math.random()<.08)audio.sfx("step");}
+    updateHotspots(dt);updatePatrols(dt);updateRival(dt);resolveDanger(dt);if((dangerActive||state.heat>=68)&&dangerBeatTimer<=0){audio.sfx("heartbeat");dangerBeatTimer=state.heat>=88?.42:.68;}updateParticles(dt);findNearest();
+    camera.x=lerp(camera.x,clamp(player.x-viewport.w/2,0,Math.max(0,world.w-viewport.w)),1-Math.exp(-5*dt));camera.y=lerp(camera.y,clamp(player.y-viewport.h/2,0,Math.max(0,world.h-viewport.h)),1-Math.exp(-5*dt));
+    if(scanPulse>0){scanPulse+=dt*1.4;if(scanPulse>1)scanPulse=0;}
+    if(state.heat>=100)caught("Hlídka tě zastavila");updateHUD();
   }
 
-  function updateDig(dt) {
-    digMarker += digDirection * dt * 1.15;
-    if (digMarker >= 1) { digMarker = 1; digDirection = -1; }
-    if (digMarker <= 0) { digMarker = 0; digDirection = 1; }
-    byId("digMarker").style.left = `calc(${digMarker * 100}% - 5px)`;
-  }
-
-  function digAttempt() {
-    if (mode !== "dig" || !currentDig) return;
-    music.sfx("dig");
-    const success = digMarker >= .4 && digMarker <= .6;
-    if (success) {
-      digHits++;
-      byId("digHits").textContent = `${digHits > 0 ? "◆" : "◇"} ${digHits > 1 ? "◆" : "◇"} ${digHits > 2 ? "◆" : "◇"}`;
-      if (digHits >= 3) setTimeout(finishDig, 180);
-    } else {
-      state.heat = clamp((state.heat || 0) + 9, 0, 100);
-      shake = Math.max(shake, 5); music.sfx("bad");
+  function updateHotspots(dt){for(const h of world.hotspots){if(!h.active)continue;if(h.revealed){h.ttl-=dt;if(h.ttl<=0&&!h.marked)h.revealed=false;}}}
+  function updatePatrols(dt){
+    for(const p of world.patrols){if(!p.active)continue;const target=p.points[p.index],dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy)||1;p.x+=dx/d*p.speed*dt;p.y+=dy/d*p.speed*dt;p.angle=Math.atan2(dy,dx);if(d<12)p.index=(p.index+1)%p.points.length;
+      if(p.type==="tractor"||p.type==="bike"||p.type==="car"){const rr=p.type==="tractor"?42:25;if(Math.hypot(p.x-player.x,p.y-player.y)<rr+player.r)caught(p.type==="tractor"?"Traktor tě srazil":"Pozor na provoz");continue;}
+      let suspicious=true;if(p.requires==="permit"&&world.runtime.permit)suspicious=false;if(p.type==="ranger"&&world.runtime.open<=0)suspicious=false;if(p.type==="police"&&world.runtime.papers>=3&&!world.rival?.active)suspicious=false;
+      p.seesPlayer=false;
+      if(!suspicious||!p.vision)continue;
+      if(insideVisionCone(p,p.vision,p.halfAngle||.57)){
+        p.seesPlayer=true;
+        const source=p.type==="digger"?"Svítilna kopáče":p.type==="ranger"?"Lesní hlídka":p.type==="police"?"Policejní hlídka":"Majitel pozemku";
+        markDanger(source,p.type==="digger"?48:38,p.type==="digger"?1.85:2.35);
+      }
     }
   }
+  function updateRival(dt){
+    const r=world.rival;
+    if(r&&r.active){
+      r.hitFlash=Math.max(0,(r.hitFlash||0)-dt);
+      const dx=r.target.x-r.x,dy=r.target.y-r.y,d=Math.hypot(dx,dy)||1;
+      const weave=r.phase>=2?Math.sin(performance.now()*.004+r.x)*18:0;
+      r.x+=(dx/d*r.speed+Math.cos(r.angle+Math.PI/2)*weave)*dt;r.y+=(dy/d*r.speed+Math.sin(r.angle+Math.PI/2)*weave)*dt;r.angle=Math.atan2(dy,dx);
+      if(d<28)r.target={x:rand(170,1630),y:rand(150,1040)};
+      r.seesPlayer=false;
+      if(r.flashlight&&insideVisionCone(r,r.vision,r.halfAngle)){
+        r.seesPlayer=true;markDanger("Karlova svítilna",r.phase>=3?72:r.phase===2?64:58,r.phase>=3?1.15:r.phase===2?1.35:1.55);
+      }
+      r.throwTimer-=dt;
+      if(r.throwTimer<=0){r.throwTimer=Math.max(.48,1.15-r.phase*.18)+Math.random()*.42;const aim=Math.atan2(player.y-r.y,player.x-r.x);world.hazards.push({type:"clod",x:r.x,y:r.y,vx:Math.cos(aim)*150*(1+r.phase*.08),vy:Math.sin(aim)*150*(1+r.phase*.08),life:2.2,r:10+r.phase});}
+    }
+    for(const h of world.hazards){if(h.type!=="clod")continue;h.x+=h.vx*dt;h.y+=h.vy*dt;h.life-=dt;if(h.life>0&&Math.hypot(h.x-player.x,h.y-player.y)<h.r+player.r){h.life=0;state.heat=clamp(state.heat+15,0,100);shake=Math.max(shake,5);toast("Zásah hroudou","bad",650);}}
+    world.hazards=world.hazards.filter(h=>h.life>0);
+  }
+  function updateParticles(dt){for(const p of world.particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=20*dt;}world.particles=world.particles.filter(p=>p.life>0);}
 
-  function finishDig() {
-    const h = currentDig; currentDig = null;
-    h.active = false;
-    mode = "playing"; showScreen(null); setPlaying(true);
-    if (h.special === "hedgehog") {
-      world.runtime.stolen = true;
-      mode = "theft"; setPlaying(false); showScreen("theft");
-      shake = 14; flash = .35; flashColor = "255,45,55"; music.sfx("alert"); vibrate([80,40,100]);
-      updateHud();
+  function findNearest(){
+    nearest=null;let best=100;const check=(kind,ref,x,y,range=68)=>{const d=Math.hypot(x-player.x,y-player.y);if(d<range&&d<best){best=d;nearest={kind,ref,x,y};}};
+    for(const p of world.props)if(p.type==="npc"&&!p.used)check("npc",p,p.x,p.y);
+    for(const h of world.hotspots)if(h.active&&h.revealed)check("hotspot",h,h.x,h.y);
+    for(const i of world.items)if(i.active&&!i.hidden)check(i.type==="hole"?"hole":"item",i,i.x,i.y,i.type==="hole"?98:68);
+    if(world.rival?.active)check("rival",world.rival,world.rival.x,world.rival.y);
+    if(world.exit)check("exit",world.exit,world.exit.x,world.exit.y,88);
+    if(nearest){const map={npc:["!","MLUVIT"],hotspot:["⛏","KOPAT"],item:["◆","SEBRAT"],hole:["▨","ZAHRABAT"],rival:["✋","CHYTIT"],exit:["→","ODEJÍT"]};const m=map[nearest.kind]||["◎","AKCE"];ui.actionIcon.textContent=m[0];ui.actionText.textContent=m[1];$("actionButton").classList.add("ready");showHint(nearest.kind==="exit"?nearest.ref.label:m[1]);}
+    else{ui.actionIcon.textContent="◉";ui.actionText.textContent=scanCooldown>0?`${Math.ceil(scanCooldown)}`:"ROZHLÉDNOUT";$("actionButton").classList.remove("ready");hideHint();}
+  }
+
+  function burst(x,y,color,count=14){for(let i=0;i<count;i++)world.particles.push({x,y,vx:rand(-90,90),vy:rand(-120,-30),life:rand(.45,.9),color,r:rand(2,5)});}
+
+  function render(){
+    ctx.setTransform(viewport.dpr,0,0,viewport.dpr,0,0);ctx.clearRect(0,0,viewport.w,viewport.h);
+    if(!world){drawMenuBackdrop();return;}
+    ctx.save();const sx=shake?(Math.random()-.5)*shake:0,sy=shake?(Math.random()-.5)*shake:0;ctx.translate(sx-camera.x,sy-camera.y);drawGround();drawWorldObjects();drawEffects();ctx.restore();drawScreenVignette();drawAtmosphereOverlay();drawObjectiveArrow();
+  }
+
+  function drawMenuBackdrop(){const g=ctx.createLinearGradient(0,0,0,viewport.h);g.addColorStop(0,"#142a35");g.addColorStop(.52,"#2b4633");g.addColorStop(1,"#3b2d22");ctx.fillStyle=g;ctx.fillRect(0,0,viewport.w,viewport.h);}
+
+  function drawGround(){
+    if(world.theme==="field")drawField();
+    else if(world.theme==="meadow")drawMeadow();
+    else if(world.theme==="forest"||world.theme==="night")drawForest();
+    else drawCity();
+  }
+  function drawField(){
+    const g=ctx.createLinearGradient(0,0,0,world.h);
+    g.addColorStop(0,"#89a65f");g.addColorStop(.12,"#6f8950");g.addColorStop(.23,"#9a8660");g.addColorStop(1,"#69503b");ctx.fillStyle=g;ctx.fillRect(0,0,world.w,world.h);
+    ctx.fillStyle="#31442d";ctx.fillRect(0,0,world.w,118);
+    for(let i=0;i<24;i++){const x=i*92;ctx.fillStyle=i%3?"#273c29":"#3c5234";ctx.beginPath();ctx.moveTo(x,118);ctx.lineTo(x+52,45+(i%4)*7);ctx.lineTo(x+115,118);ctx.closePath();ctx.fill();}
+    ctx.fillStyle="#708951";ctx.fillRect(0,118,world.w,100);
+    for(let y=225;y<world.h+80;y+=96){ctx.fillStyle=y%192===0?"#7c6248":"#72573f";ctx.fillRect(0,y,world.w,64);ctx.strokeStyle="rgba(48,31,20,.27)";ctx.lineWidth=3;for(let x=-20;x<world.w;x+=44){ctx.beginPath();ctx.moveTo(x,y+5);ctx.lineTo(x+28,y+59);ctx.stroke();}ctx.strokeStyle="rgba(209,176,126,.16)";ctx.lineWidth=1.4;for(let x=10;x<world.w;x+=62){ctx.beginPath();ctx.moveTo(x,y+8);ctx.lineTo(x+18,y+56);ctx.stroke();}}
+    for(let i=0;i<150;i++){const x=(i*127)%world.w,y=220+((i*83)%960);ctx.fillStyle=i%2?"rgba(52,40,29,.32)":"rgba(205,176,127,.22)";ctx.fillRect(x,y,2+(i%3),2+(i%2));}
+  }
+  function drawMeadow(){
+    const g=ctx.createLinearGradient(0,0,0,world.h);g.addColorStop(0,"#5d6f54");g.addColorStop(.25,"#74806a");g.addColorStop(1,"#b8a782");ctx.fillStyle=g;ctx.fillRect(0,0,world.w,world.h);
+    for(let i=0;i<26;i++){const x=70+i*75;ctx.fillStyle=i%2?"rgba(42,69,48,.5)":"rgba(60,87,59,.42)";ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+35,120);ctx.lineTo(x-20,120);ctx.closePath();ctx.fill();}
+    for(let i=0;i<18;i++){const x=80+(i*137)%1650,y=120+(i*193)%1030,w=150+(i%4)*45,h=62+(i%3)*24;ctx.fillStyle=i%2?"rgba(216,199,158,.62)":"rgba(195,174,129,.6)";ctx.beginPath();ctx.ellipse(x,y,w,h,(i%5)*.17,0,Math.PI*2);ctx.fill();}
+    for(let i=0;i<320;i++){const x=(i*97)%world.w,y=(i*61)%world.h;ctx.fillStyle=i%3?"rgba(106,91,65,.25)":"rgba(235,219,178,.28)";ctx.fillRect(x,y,2+(i%3),2+(i%2));}
+    ctx.strokeStyle="rgba(126,106,76,.28)";ctx.lineWidth=44;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(180,1100);ctx.bezierCurveTo(520,870,730,760,900,560);ctx.bezierCurveTo(1180,260,1430,310,1640,120);ctx.stroke();
+    ctx.strokeStyle="rgba(232,218,184,.5)";ctx.lineWidth=24;ctx.stroke();
+  }
+  function drawForest(){
+    if(world.id==="besednice"){
+      const g=ctx.createLinearGradient(0,0,0,world.h);g.addColorStop(0,"#53614f");g.addColorStop(.12,"#59634f");g.addColorStop(.18,"#8b7b61");g.addColorStop(1,"#8c7155");ctx.fillStyle=g;ctx.fillRect(0,0,world.w,world.h);
+      ctx.fillStyle="#24382a";ctx.fillRect(0,0,world.w,118);
+      for(let i=0;i<24;i++){const x=i*85;ctx.fillStyle=i%2?"#29452f":"#36553a";ctx.beginPath();ctx.moveTo(x,118);ctx.lineTo(x+38,32);ctx.lineTo(x+78,118);ctx.closePath();ctx.fill();}
+      for(let i=0;i<32;i++){const x=80+(i*157)%1650,y=145+(i*107)%980,w=110+(i%5)*33,h=44+(i%3)*18;ctx.fillStyle=i%2?"rgba(180,151,107,.32)":"rgba(117,91,65,.32)";ctx.beginPath();ctx.ellipse(x,y,w,h,(i%7)*.13,0,Math.PI*2);ctx.fill();}
+      for(let i=0;i<22;i++){const y=180+i*48;ctx.strokeStyle=i%2?"rgba(91,69,50,.28)":"rgba(218,191,145,.18)";ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(120+(i%4)*35,y);ctx.bezierCurveTo(600,y-30,1100,y+35,1680,y-10);ctx.stroke();}
       return;
     }
-    const stone = createStone(LEVELS[state.levelIndex].name, h.rarity, h.documented !== false);
-    addStone(stone, h.x, h.y);
-    if (world.id === "chlum") world.runtime.collected++;
-    if (world.id === "nesmen") {
-      world.runtime.dug++; world.runtime.open++;
-      addItem("hole", h.x, h.y, { profileWidth: h.width, profileHeight: h.height });
+    const sandy = world.id === "nesmen";const g=ctx.createLinearGradient(0,0,0,world.h);g.addColorStop(0,sandy?"#60724a":"#4a5a3d");g.addColorStop(1,sandy?"#455636":"#33412b");ctx.fillStyle=g;ctx.fillRect(0,0,world.w,world.h);
+    for(let i=0;i<220;i++){const x=(i*113)%world.w,y=(i*71)%world.h;ctx.fillStyle=sandy?(i%2?"rgba(202,182,138,.07)":"rgba(30,56,35,.12)"):(i%2?"rgba(76,98,60,.12)":"rgba(29,49,35,.14)");ctx.beginPath();ctx.arc(x,y,2+(i%7),0,Math.PI*2);ctx.fill();}
+    if(sandy){for(let i=0;i<18;i++){const x=130+(i*147)%1550,y=100+(i*193)%960,w=150+(i%4)*30,h=82+(i%3)*18;ctx.fillStyle=i%2?"rgba(210,184,132,.16)":"rgba(235,213,170,.10)";ctx.beginPath();ctx.ellipse(x,y,w,h,(i%5)*.22,0,Math.PI*2);ctx.fill();}}
+    ctx.strokeStyle=sandy?"#8f7650":"#6d563a";ctx.lineWidth=112;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(150,1100);ctx.bezierCurveTo(500,900,520,580,890,620);ctx.bezierCurveTo(1250,660,1330,330,1660,130);ctx.stroke();ctx.strokeStyle=sandy?"rgba(227,209,170,.72)":"rgba(177,157,118,.36)";ctx.lineWidth=sandy?66:58;ctx.stroke();
+  }
+  function drawCity(){
+    const g=ctx.createLinearGradient(0,0,0,world.h);g.addColorStop(0,"#9cb2bb");g.addColorStop(.2,"#7c8f8d");g.addColorStop(1,"#59605b");ctx.fillStyle=g;ctx.fillRect(0,0,world.w,world.h);
+    const river=ctx.createLinearGradient(0,0,420,0);river.addColorStop(0,"#245a68");river.addColorStop(1,"#4e9db0");ctx.fillStyle=river;ctx.fillRect(0,0,420,world.h);
+    for(let y=0;y<world.h;y+=32){ctx.fillStyle=y%64?"rgba(255,255,255,.08)":"rgba(184,230,234,.11)";ctx.fillRect(0,y,420,11);}
+    ctx.fillStyle="#787a72";ctx.fillRect(420,0,120,world.h);ctx.fillStyle="#b6b2a7";ctx.fillRect(540,0,340,world.h);for(let y=0;y<world.h;y+=78){ctx.fillStyle="rgba(255,255,255,.1)";ctx.fillRect(540,y+18,340,6);}
+    ctx.fillStyle="#42464a";ctx.fillRect(880,0,210,world.h);ctx.fillStyle="#8c8e87";ctx.fillRect(1090,0,710,world.h);ctx.strokeStyle="#eadfb8";ctx.setLineDash([28,25]);ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(985,0);ctx.lineTo(985,world.h);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#a3a69e";ctx.fillRect(1090,0,710,420);for(let y=40;y<400;y+=60){ctx.strokeStyle="rgba(255,255,255,.15)";ctx.beginPath();ctx.moveTo(1090,y);ctx.lineTo(1800,y);ctx.stroke();}
+  }
+
+  function drawWorldObjects(){
+    const drawables=[];world.props.forEach(o=>drawables.push({y:o.y,kind:"prop",o}));world.items.filter(o=>o.active&&!o.hidden).forEach(o=>drawables.push({y:o.y,kind:"item",o}));world.hotspots.filter(o=>o.active&&o.revealed).forEach(o=>drawables.push({y:o.y,kind:"hotspot",o}));world.patrols.filter(o=>o.active).forEach(o=>drawables.push({y:o.y,kind:"patrol",o}));if(world.rival?.active)drawables.push({y:world.rival.y,kind:"rival",o:world.rival});drawables.push({y:player.y,kind:"player",o:player});drawables.sort((a,b)=>a.y-b.y);
+    for(const d of drawables){if(d.kind==="prop")drawProp(d.o);else if(d.kind==="item")drawItem(d.o);else if(d.kind==="hotspot")drawHotspot(d.o);else if(d.kind==="patrol")drawPatrol(d.o);else if(d.kind==="rival")drawRival(d.o);else drawPlayer();}
+    if(world.exit)drawExit(world.exit);
+  }
+
+  function drawProp(p){ctx.save();ctx.translate(p.x,p.y);const s=p.scale||1;ctx.scale(s,s);
+    if(p.type==="tree"||p.type==="pine"){ctx.fillStyle="rgba(0,0,0,.25)";ellipse(0,17,35,13);ctx.fillStyle="#5b4029";roundRect(ctx,-8,-12,16,48,7);ctx.fill();const col=p.type==="pine"?(world.theme==="night"?"#173527":"#285c39"):"#3e713d";ctx.fillStyle=col;for(const q of p.type==="pine"?[[0,-55,32],[0,-30,38],[0,-5,42]]:[[-16,-35,28],[14,-38,30],[0,-58,34],[0,-18,38]]){ctx.beginPath();ctx.arc(q[0],q[1],q[2],0,Math.PI*2);ctx.fill();}}
+    else if(p.type==="bush"){ctx.fillStyle="rgba(0,0,0,.2)";ellipse(0,12,28,10);ctx.fillStyle="#3c743c";for(const q of [[-14,-2,17],[10,-8,20],[0,-20,19]]){ctx.beginPath();ctx.arc(q[0],q[1],q[2],0,Math.PI*2);ctx.fill();}}
+    else if(p.type==="fern"){ctx.strokeStyle="#2b6a3f";ctx.lineWidth=3;for(const a of [-.85,-.45,-.1,.2,.55,.9]){ctx.beginPath();ctx.moveTo(0,16);ctx.quadraticCurveTo(a*10,-2,a*16,-24);ctx.stroke();}}
+    else if(p.type==="grass"){ctx.strokeStyle="#88a864";ctx.lineWidth=2;for(const a of [-7,-3,0,4,8]){ctx.beginPath();ctx.moveTo(a,14);ctx.quadraticCurveTo(a*.4,-2,a*1.2,-18-(Math.abs(a)%3));ctx.stroke();}}
+    else if(p.type==="stump"){ctx.fillStyle="rgba(0,0,0,.2)";ellipse(0,12,18,7);ctx.fill();ctx.fillStyle="#6d4d32";roundRect(ctx,-14,-8,28,24,6);ctx.fill();ctx.fillStyle="#c7a06a";ctx.beginPath();ctx.ellipse(0,-8,14,7,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#8f6d45";ctx.lineWidth=2;ctx.stroke();}
+    else if(p.type==="log"){ctx.rotate(p.angle||0);ctx.fillStyle="#6a4b31";roundRect(ctx,-30,-8,60,16,7);ctx.fill();ctx.fillStyle="#5a3f2b";ctx.beginPath();ctx.arc(-24,0,7,0,Math.PI*2);ctx.arc(24,0,7,0,Math.PI*2);ctx.fill();}
+    else if(p.type==="puddle"){ctx.fillStyle="rgba(99,151,153,.46)";ellipse(0,0,p.r||28,(p.r||28)*.45);ctx.strokeStyle="rgba(214,242,238,.25)";ctx.stroke();}
+    else if(p.type==="rock"){ctx.fillStyle="rgba(0,0,0,.22)";ellipse(0,12,20,8);ctx.fillStyle="#767465";ctx.beginPath();ctx.moveTo(-18,10);ctx.lineTo(-12,-11);ctx.lineTo(5,-18);ctx.lineTo(21,1);ctx.lineTo(12,16);ctx.closePath();ctx.fill();}
+    else if(p.type==="farm"||p.type==="hut"){ctx.fillStyle="rgba(0,0,0,.25)";ellipse(0,22,58,15);ctx.fillStyle=p.type==="farm"?"#d7c7a7":"#74543a";roundRect(ctx,-47,-38,94,60,5);ctx.fill();ctx.fillStyle="#7c392f";ctx.beginPath();ctx.moveTo(-57,-38);ctx.lineTo(0,-78);ctx.lineTo(57,-38);ctx.closePath();ctx.fill();ctx.fillStyle="#49342a";ctx.fillRect(-12,-12,24,34);}
+    else if(p.type==="fieldpit"){ctx.rotate(p.angle||0);const w=(p.w||180),h=(p.h||70);ctx.fillStyle="rgba(0,0,0,.22)";ctx.beginPath();ctx.ellipse(0,16,w*.58,h*.42,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#9d7248";roundRect(ctx,-w/2-16,-h/2-10,w+32,h+20,16);ctx.fill();ctx.fillStyle="#c59663";roundRect(ctx,-w/2-8,-h/2-4,w+16,h+8,11);ctx.fill();ctx.fillStyle="#241a13";ctx.beginPath();ctx.moveTo(-w/2,-h/2);ctx.lineTo(w/2,-h/2);ctx.lineTo(w/2-18,h/2);ctx.lineTo(-w/2+18,h/2);ctx.closePath();ctx.fill();ctx.strokeStyle="#e2bb88";ctx.lineWidth=4;ctx.stroke();ctx.fillStyle="rgba(255,255,255,.08)";ctx.fillRect(-w/2+10,-h/2+6,w-20,6);}
+    else if(p.type==="soilheap"){ctx.fillStyle="rgba(0,0,0,.2)";ctx.beginPath();ctx.ellipse(0,12,35,10,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#886747";ctx.beginPath();ctx.moveTo(-36,12);ctx.quadraticCurveTo(-12,-22,0,-12);ctx.quadraticCurveTo(18,-28,39,12);ctx.closePath();ctx.fill();ctx.fillStyle="rgba(188,151,100,.26)";ctx.beginPath();ctx.arc(-8,-4,5,0,Math.PI*2);ctx.arc(12,-7,4,0,Math.PI*2);ctx.fill();}
+    else if(p.type==="stubble"){ctx.strokeStyle="#b7a271";ctx.lineWidth=2;for(let i=-4;i<=4;i+=2){ctx.beginPath();ctx.moveTo(i,9);ctx.lineTo(i-2,-9-(i%3));ctx.stroke();}}
+    else if(p.type==="realpine"){ctx.rotate(p.lean||0);ctx.fillStyle="rgba(0,0,0,.2)";ctx.beginPath();ctx.ellipse(0,16,18,7,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#8a5738";roundRect(ctx,-4,-58,8,78,3);ctx.fill();ctx.fillStyle="#b36d42";ctx.fillRect(-3,-54,2,60);ctx.fillStyle=world.id==="locenice"?"#49634a":"#2d5236";for(const q of [[0,-72,20],[0,-55,24],[0,-38,21]]){ctx.beginPath();ctx.moveTo(0,q[1]-q[2]);ctx.lineTo(-q[2],q[1]+q[2]);ctx.lineTo(q[2],q[1]+q[2]);ctx.closePath();ctx.fill();}}
+    else if(p.type==="sandmound"||p.type==="earthbank"){ctx.rotate(p.angle||0);ctx.fillStyle="rgba(0,0,0,.18)";ctx.beginPath();ctx.ellipse(0,15,52,13,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=p.type==="sandmound"?"#c7b38a":"#9b7858";ctx.beginPath();ctx.moveTo(-55,15);ctx.quadraticCurveTo(-20,-25,0,-15);ctx.quadraticCurveTo(30,-32,58,15);ctx.closePath();ctx.fill();ctx.strokeStyle=p.type==="sandmound"?"rgba(238,220,177,.45)":"rgba(190,148,102,.35)";ctx.lineWidth=3;ctx.stroke();}
+    else if(p.type==="sandpit"||p.type==="minepit"){ctx.rotate(p.angle||0);const w=(p.w||100),h=(p.h||52);const lip=p.type==="sandpit"?"#d8c39a":"#956c4a";const wall=p.type==="sandpit"?"#9d8861":"#694a33";const deep=p.type==="sandpit"?"#62584b":"#241a13";ctx.fillStyle="rgba(0,0,0,.2)";ctx.beginPath();ctx.ellipse(0,12,w*.58,h*.45,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=lip;roundRect(ctx,-w/2-10,-h/2-8,w+20,h+16,12);ctx.fill();ctx.fillStyle=wall;ctx.beginPath();ctx.moveTo(-w/2,-h/2);ctx.lineTo(w/2,-h/2);ctx.lineTo(w/2-14,h/2);ctx.lineTo(-w/2+14,h/2);ctx.closePath();ctx.fill();ctx.fillStyle=deep;ctx.beginPath();ctx.moveTo(-w/2+10,-h/2+9);ctx.lineTo(w/2-10,-h/2+9);ctx.lineTo(w/2-22,h/2-7);ctx.lineTo(-w/2+22,h/2-7);ctx.closePath();ctx.fill();ctx.strokeStyle=p.type==="sandpit"?"#f2debb":"#c7986a";ctx.lineWidth=3;ctx.stroke();}
+    else if(p.type==="fallenpine"){ctx.rotate(p.angle||0);ctx.fillStyle="#8b5737";roundRect(ctx,-50,-5,100,10,5);ctx.fill();ctx.strokeStyle="#385b3f";ctx.lineWidth=3;for(let x=-35;x<45;x+=16){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x-8,-15);ctx.moveTo(x+5,0);ctx.lineTo(x+12,13);ctx.stroke();}}
+    else if(p.type==="trackscar"){ctx.rotate(p.angle||0);ctx.strokeStyle="rgba(68,48,34,.55)";ctx.lineWidth=5;for(const y of [-10,10]){ctx.beginPath();ctx.moveTo(-55,y);ctx.lineTo(55,y);ctx.stroke();for(let x=-48;x<50;x+=14){ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x+7,y+4);ctx.stroke();}}}
+    else if(p.type==="excavator"){ctx.rotate(p.angle||0);ctx.fillStyle="rgba(0,0,0,.25)";ctx.beginPath();ctx.ellipse(0,22,58,16,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#36322d";roundRect(ctx,-42,8,74,18,8);ctx.fill();ctx.strokeStyle="#5a554d";ctx.lineWidth=4;for(let x=-34;x<28;x+=14){ctx.beginPath();ctx.moveTo(x,10);ctx.lineTo(x+8,24);ctx.stroke();}ctx.fillStyle="#d6a52e";roundRect(ctx,-26,-18,48,32,7);ctx.fill();ctx.fillStyle="#35434a";roundRect(ctx,-14,-34,28,22,4);ctx.fill();ctx.fillStyle="rgba(194,225,235,.35)";ctx.fillRect(-10,-31,11,12);ctx.strokeStyle="#d6a52e";ctx.lineWidth=10;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(20,-12);ctx.lineTo(50,-40);ctx.lineTo(78,-18);ctx.stroke();ctx.fillStyle="#6e5432";ctx.beginPath();ctx.moveTo(70,-25);ctx.lineTo(91,-16);ctx.lineTo(75,-3);ctx.closePath();ctx.fill();}
+    else if(p.type==="plazatree"){ctx.fillStyle="rgba(0,0,0,.16)";ctx.beginPath();ctx.ellipse(0,15,24,8,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#6a5140";ctx.fillRect(-4,-32,8,50);ctx.fillStyle="#507044";for(const q of [[-12,-35,18],[12,-38,20],[0,-55,22]]){ctx.beginPath();ctx.arc(q[0],q[1],q[2],0,Math.PI*2);ctx.fill();}}
+    else if(p.type==="plaza"){ctx.fillStyle="rgba(232,233,228,.5)";roundRect(ctx,-190,-70,380,140,16);ctx.fill();for(let i=-160;i<=160;i+=40){ctx.strokeStyle="rgba(110,115,112,.18)";ctx.beginPath();ctx.moveTo(i,-70);ctx.lineTo(i,70);ctx.stroke();}for(let i=0;i<8;i++){const x=-140+i*40;ctx.fillStyle=i%2?"#48535c":"#7a6a5d";ctx.beginPath();ctx.arc(x,5+(i%3)*10,5,0,Math.PI*2);ctx.fill();}}
+    else if(p.type==="npc")drawActor(0,0,p.role==="owner"?"ranger":"farmer",0,p.name,true);
+    else if(p.type==="pit"){const r=p.r||28;ctx.fillStyle="rgba(0,0,0,.25)";ellipse(0,12,r*1.1,r*.55);ctx.fill();ctx.fillStyle="#a27a4f";roundRect(ctx,-r-8,-r*.55,r*2+16,r*1.15,9);ctx.fill();ctx.fillStyle="#251b14";ctx.beginPath();ctx.moveTo(-r,-r*.38);ctx.lineTo(r,-r*.38);ctx.lineTo(r-10,r*.38);ctx.lineTo(-r+10,r*.38);ctx.closePath();ctx.fill();ctx.strokeStyle="#d0ad7d";ctx.lineWidth=4;ctx.stroke();}
+    else if(p.type==="sign"){ctx.fillStyle="#744e2f";ctx.fillRect(-4,-30,8,50);ctx.fillStyle="#d5c49d";roundRect(ctx,-42,-52,84,28,5);ctx.fill();ctx.fillStyle="#3f3427";ctx.font="bold 10px sans-serif";ctx.textAlign="center";ctx.fillText(p.text||"",0,-34);}
+    else if(p.type==="lamp"){ctx.fillStyle="#3c4344";ctx.fillRect(-3,-55,6,70);ctx.fillStyle="#ffe6a0";ctx.beginPath();ctx.arc(0,-57,8,0,Math.PI*2);ctx.fill();}
+    else if(p.type==="bridge"){ctx.fillStyle="#4f6f78";roundRect(ctx,-115,-28,230,56,16);ctx.fill();ctx.strokeStyle="#a8cad0";ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,25,105,Math.PI,0);ctx.stroke();}
+    else if(p.type==="slavie"){
+      ctx.fillStyle="rgba(0,0,0,.24)";ctx.beginPath();ctx.ellipse(0,68,220,28,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle="#e9ebe6";ctx.beginPath();ctx.moveTo(-215,-110);ctx.lineTo(-78,-110);ctx.lineTo(-78,52);ctx.lineTo(-215,52);ctx.closePath();ctx.fill();
+      ctx.fillStyle="#ffffff";ctx.beginPath();ctx.moveTo(-215,-110);ctx.lineTo(-50,-110);ctx.lineTo(-20,-88);ctx.lineTo(-20,52);ctx.lineTo(-215,52);ctx.closePath();ctx.fill();
+      ctx.fillStyle="rgba(168,215,220,.58)";ctx.beginPath();ctx.moveTo(-205,-4);ctx.lineTo(-40,-4);ctx.lineTo(-40,46);ctx.lineTo(-205,46);ctx.closePath();ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,.65)";ctx.lineWidth=2;for(let x=-190;x<-45;x+=22){ctx.beginPath();ctx.moveTo(x,-4);ctx.lineTo(x,46);ctx.stroke();}
+      ctx.fillStyle="#d8d6cf";ctx.beginPath();ctx.moveTo(-10,-82);ctx.lineTo(178,-82);ctx.lineTo(178,52);ctx.lineTo(-10,52);ctx.closePath();ctx.fill();
+      ctx.fillStyle="#c6c4bd";ctx.beginPath();ctx.moveTo(178,-82);ctx.lineTo(198,-70);ctx.lineTo(198,52);ctx.lineTo(178,52);ctx.closePath();ctx.fill();
+      ctx.strokeStyle="#9b9b98";ctx.lineWidth=3;ctx.strokeRect(-10,-82,188,134);
+      ctx.fillStyle="#ece7df";ctx.beginPath();ctx.moveTo(-16,-82);ctx.lineTo(84,-138);ctx.lineTo(188,-82);ctx.closePath();ctx.fill();ctx.strokeStyle="#a5a5a2";ctx.stroke();
+      ctx.strokeStyle="#9d9d9a";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-4,-56);ctx.lineTo(172,-56);ctx.moveTo(-4,-18);ctx.lineTo(172,-18);ctx.stroke();
+      ctx.fillStyle="#4a5962";for(let yy=-70;yy<26;yy+=38)for(let xx=12;xx<=150;xx+=34){roundRect(ctx,xx-8,yy,16,24,3);ctx.fill();}
+      ctx.fillStyle="#43382f";roundRect(ctx,72,8,30,44,3);ctx.fill();
+      ctx.fillStyle="#f5f5f2";ctx.beginPath();ctx.moveTo(-65,-104);ctx.lineTo(-35,-104);ctx.lineTo(-35,-138);ctx.lineTo(-65,-138);ctx.closePath();ctx.fill();
+      ctx.fillStyle="#2d6b4b";roundRect(ctx,-55,-127,104,18,5);ctx.fill();ctx.fillStyle="#edf7f0";ctx.font="bold 10px sans-serif";ctx.textAlign="center";ctx.fillText("NA ZELENÉ VLNĚ",-3,-114);
+      ctx.fillStyle="#ecebe7";ctx.beginPath();ctx.moveTo(-8,52);ctx.lineTo(182,52);ctx.lineTo(198,64);ctx.lineTo(8,64);ctx.closePath();ctx.fill();
     }
-    updateHud(); saveGame();
+    ctx.restore();
   }
 
-  function startBossAfterTheft() {
-    showScreen(null); mode = "playing"; setPlaying(true);
-    spawnBoss("karel", 1120, 560);
-    toast("Karel sprintuje. Chyť ho, až se zastaví!", "bad", 2200);
-  }
-
-  function spawnBoss(type, x, y) {
-    const isKarel = type === "karel";
-    world.boss = {
-      type, displayName: isKarel ? "KRYSTALOVÝ KAREL" : "FETÁK FRANTA",
-      x, y, r: 31, active: true, hits: 0, maxHits: isKarel ? 3 : 2, phase: 1,
-      mode: "dash", timer: 1.35, speed: isKarel ? 245 : 230, target: randomBossTarget(), angle: 0,
-      flashlight: isKarel, vision: isKarel ? 285 : 0, halfAngle: .5, invulnerable: 1.0, trail: []
+  function drawActor(x,y,type,angle=0,name="",local=false){
+    ctx.save(); if(!local)ctx.translate(x,y); ctx.rotate(0);
+    const styles = {
+      farmer:{coat:"#8a6a48",trim:"#be9864",pants:"#314049",skin:"#cb946e",hair:"#6d5232",hat:"#8d7449",accent:"#d5c29e"},
+      ranger:{coat:"#446749",trim:"#78a06e",pants:"#2a3940",skin:"#c9936d",hair:"#33412f",hat:"#223628",accent:"#dbe7cf"},
+      police:{coat:"#355f88",trim:"#5e8fbe",pants:"#273742",skin:"#cb9470",hair:"#24394d",hat:"#21384b",accent:"#d7e9f8"},
+      digger:{coat:"#6e3a35",trim:"#ad6659",pants:"#352a30",skin:"#bb815e",hair:"#302624",hat:"#2b2524",accent:"#efd1b8"},
+      rival:{coat:"#764840",trim:"#bf8374",pants:"#38292b",skin:"#c28964",hair:"#302624",hat:"#2b2524",accent:"#ffd7c9"},
+      player:{coat:"#3d754e",trim:"#78b88d",pants:"#25343a",skin:"#c88e67",hair:"#183526",hat:"#163728",accent:"#e8f7ef"}
     };
-    music.sfx("alert"); updateHud();
+    const s = styles[type] || styles.farmer;
+    const t = performance.now()*0.008 + (x+y)*0.002;
+    const walk = type==="player" ? Math.sin(player.step*1.1) : (local?Math.sin(t)*.15:Math.sin(t)*.65);
+    const bob = Math.abs(walk)*1.5;
+    const arm = walk*5.2, leg = walk*4.6;
+    ctx.translate(0,-bob);
+    ctx.fillStyle="rgba(0,0,0,.24)"; ctx.beginPath(); ctx.ellipse(0,16,20,8,0,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=s.pants; ctx.lineWidth=8; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(-5,0); ctx.lineTo(-8+leg,21); ctx.moveTo(5,0); ctx.lineTo(8-leg,21); ctx.stroke();
+    ctx.strokeStyle="#1f2529"; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(-8+leg,21); ctx.lineTo(-10+leg,24); ctx.moveTo(8-leg,21); ctx.lineTo(10-leg,24); ctx.stroke();
+    ctx.fillStyle=s.coat; roundRect(ctx,-16,-28,32,34,10); ctx.fill(); ctx.fillStyle=s.trim; roundRect(ctx,-12,-24,24,20,8); ctx.fill(); ctx.fillStyle=s.accent; roundRect(ctx,-4,-24,8,30,4); ctx.fill();
+    ctx.strokeStyle=s.coat; ctx.lineWidth=4.5; ctx.beginPath(); ctx.moveTo(0,-24); ctx.lineTo(0,4); ctx.stroke();
+    ctx.strokeStyle=s.trim; ctx.lineWidth=5.5; ctx.beginPath(); ctx.moveTo(-13,-18); ctx.lineTo(-18-arm,-2); ctx.moveTo(13,-18); ctx.lineTo(18+arm,-2); ctx.stroke();
+    ctx.fillStyle=s.skin; ctx.beginPath(); ctx.arc(-18-arm,-2,3.2,0,Math.PI*2); ctx.arc(18+arm,-2,3.2,0,Math.PI*2); ctx.fill();
+    if(type==="player"||type==="rival"||type==="digger"){ctx.fillStyle="#6e4e32"; roundRect(ctx,-10,-23,20,20,5); ctx.fill();}
+    ctx.fillStyle=s.skin; ctx.fillRect(-3,-31,6,5); ctx.beginPath(); ctx.arc(0,-41,11.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=s.hair; ctx.beginPath(); ctx.arc(0,-45,11.5,Math.PI,0); ctx.fill();
+    ctx.fillStyle=s.hat; roundRect(ctx,-13,-52,26,8,4); ctx.fill(); if(type!=="player"){ctx.fillRect(-8,-55,16,4);} else {ctx.fillRect(-7,-54,14,4);} 
+    ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(-4.2,-41,1.8,0,Math.PI*2); ctx.arc(4.2,-41,1.8,0,Math.PI*2); ctx.fill(); ctx.fillStyle="#1a1a1a"; ctx.beginPath(); ctx.arc(-4.2,-41,0.8,0,Math.PI*2); ctx.arc(4.2,-41,0.8,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="rgba(83,53,35,.75)"; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(-4,-35); ctx.quadraticCurveTo(0,-32,4,-35); ctx.stroke();
+    if(type==="rival"||type==="digger"||type==="player"){ctx.strokeStyle="#8a623a"; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(14,-18); ctx.lineTo(23,18); ctx.stroke();}
+    ctx.restore();
+  }
+  function drawPlayer(){
+    ctx.save();ctx.translate(player.x,player.y);const blink=player.invuln>0&&Math.floor(player.invuln*10)%2===0;ctx.globalAlpha=blink?.4:1; drawActor(0,0,"player",0,"",true); ctx.fillStyle="rgba(122,183,148,.12)";roundRect(ctx,-20,-30,40,40,13);ctx.strokeStyle="rgba(255,255,255,.08)";ctx.lineWidth=2;ctx.stroke(); ctx.restore();
+  }
+  function drawVisionCone(observer,vision,halfAngle=.57,active=false,boss=false){
+    if(!vision)return; ctx.save();ctx.translate(observer.x,observer.y);ctx.rotate(observer.angle); const gradient=ctx.createRadialGradient(0,0,8,0,0,vision);
+    if(active){gradient.addColorStop(0,boss?"rgba(255,242,173,.62)":"rgba(255,205,100,.46)");gradient.addColorStop(.72,"rgba(255,128,76,.12)");gradient.addColorStop(1,"rgba(255,72,61,.03)");}
+    else{gradient.addColorStop(0,boss?"rgba(255,236,157,.28)":"rgba(255,213,104,.14)");gradient.addColorStop(1,"rgba(255,213,104,0)");}
+    ctx.fillStyle=gradient;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,vision,-halfAngle,halfAngle);ctx.closePath();ctx.fill(); ctx.strokeStyle=active?"rgba(255,93,76,.9)":boss?"rgba(255,232,151,.38)":"rgba(255,213,104,.22)";ctx.lineWidth=active?3:1.5;ctx.stroke();ctx.restore();
+  }
+  function drawRival(r){
+    if(r.flashlight)drawVisionCone(r,r.vision,r.halfAngle,r.seesPlayer,true);
+    ctx.save();
+    ctx.translate(r.x,r.y);
+    const pulse=1+Math.sin(performance.now()*0.012)*0.06;
+    const aura=r.name==="karel"?"rgba(242,203,114,.28)":"rgba(205,91,126,.26)";
+    ctx.fillStyle=aura;ctx.beginPath();ctx.arc(0,-18,34*pulse,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    ctx.save();ctx.translate(r.x,r.y);ctx.scale(1.24,1.24);drawActor(0,0,"rival",r.angle,"",true);ctx.restore();
+    if(r.hitFlash>0){ctx.save();ctx.translate(r.x,r.y);ctx.strokeStyle=`rgba(255,138,114,${r.hitFlash*2.4})`;ctx.lineWidth=6;ctx.beginPath();ctx.arc(0,-8,31+r.hitFlash*14,0,Math.PI*2);ctx.stroke();ctx.restore();}
+    const label=r.displayName|| (r.name==="karel"?"KRYSTALOVÝ KAREL":"FETÁK FRANTA");
+    ctx.save();ctx.translate(r.x,r.y-84);const w=Math.max(150, label.length*8.2);ctx.fillStyle="rgba(25,12,12,.88)";roundRect(ctx,-w/2,-18,w,28,10);ctx.fill();ctx.strokeStyle=r.name==="karel"?"#f2cb72":"#ff7c8a";ctx.lineWidth=2;ctx.stroke();ctx.fillStyle=r.name==="karel"?"#ffe8b4":"#ffd4dc";ctx.textAlign="center";ctx.font="bold 16px Inter, sans-serif";ctx.fillText(label,0,1);ctx.restore();
   }
 
-  function randomBossTarget() { return { x: random(320, world.width - 250), y: random(220, world.height - 220) }; }
-
-  function hitBoss() {
-    const boss = world.boss;
-    if (!boss?.active) return;
-    if (boss.mode !== "tired" || boss.invulnerable > 0) { toast("Počkej, až se po sprintu zastaví", "bad"); return; }
-    boss.hits++; boss.phase = Math.min(3, boss.hits + 1); boss.invulnerable = .35;
-    music.sfx("hit"); shake = 9; flash = .16; flashColor = "255,116,84"; burst(boss.x,boss.y,"#ff8b68",24); vibrate([35,35,50]);
-    if (boss.hits >= boss.maxHits) {
-      boss.active = false;
-      world.runtime.bossDefeated = true;
-      if (boss.type === "karel") addStone(createStone("Besednice", "hedgehog", true), boss.x, boss.y);
-      else { state.score += 1800; music.sfx("win"); toast("Poslední certifikát je zpět", "good", 1800); }
-    } else {
-      boss.mode = "dash"; boss.timer = Math.max(.78, 1.25 - boss.hits * .14); boss.target = randomBossTarget(); boss.speed += 30; boss.vision += boss.flashlight ? 25 : 0;
-      toast(`Zásah ${boss.hits}/${boss.maxHits} · boss zrychluje`, "good");
-    }
-    updateHud(); saveGame();
-  }
-
-  function collectItem(item) {
-    if (item.type === "sample") { startIdentify(item); return; }
-    item.active = false;
-    if (item.type === "clue") {
-      world.runtime.clues++;
-      music.sfx("good"); toast(`Stopa: ${item.label}`, "good");
-      if (world.runtime.clues >= 3 && !world.runtime.profileSpawned) {
-        world.runtime.profileSpawned = true;
-        addHotspot(1110, 650, { profile: true, special: "hedgehog", width: 112, height: 62, revealed: true, documented: true, rarity: "hedgehog" });
-        toast("Ježkový profil odhalen", "good", 1900); music.sfx("rare");
-      }
-    } else if (item.type === "document") {
-      world.runtime.documents++;
-      music.sfx("good"); toast(`Dokument: ${item.label}`, "good");
-      if (world.runtime.documents >= 3 && !world.boss) setTimeout(() => spawnBoss("franta", 1460, 430), 400);
-    }
-    updateHud(); saveGame();
-  }
-
-  function startIdentify(item) {
-    currentSample = item;
-    byId("sampleName").textContent = item.sample.name;
-    byId("sampleText").textContent = item.sample.text;
-    byId("sampleIcon").style.color = item.sample.real ? "#76e6bf" : "#69d998";
-    mode = "identify"; setPlaying(false); showScreen("identify");
-  }
-
-  function identifySample(answerReal) {
-    if (!currentSample) return;
-    const item = currentSample; currentSample = null;
-    const correct = answerReal === item.sample.real;
-    item.active = false;
-    world.runtime.identified++;
-    if (correct) {
-      world.runtime.correct++;
-      if (item.sample.real) { world.runtime.real++; addStone(createStone("Ločenice", world.runtime.real >= 3 ? "good" : "common", true), item.x, item.y); }
-      music.sfx("good"); toast("Správné určení", "good");
-    } else {
-      music.sfx("bad"); toast("Chybné určení · objeví se nový vzorek", "bad");
-      const replacement = choose(SAMPLES);
-      addItem("sample", clamp(item.x + random(-180,180),180,2020), clamp(item.y + random(-160,160),180,1240), { hidden: true, sample: replacement });
-    }
-    mode = "playing"; showScreen(null); setPlaying(true); updateHud(); saveGame();
-  }
-
-  function fillHole(hole) {
-    hole.active = false;
-    world.runtime.filled++; world.runtime.open = Math.max(0, world.runtime.open - 1);
-    state.score += 180; music.sfx("good"); toast("Profil zahrabán", "good"); updateHud(); saveGame();
-  }
-
-  function createStone(locality, rarity = "common", documented = true) {
-    const ranges = { common:[.5,1.8], good:[1.6,3.8], rare:[3.4,7.2], hedgehog:[5.8,10.8] };
-    const names = { common:"Drobný vltavín", good:"Olivový splash", rare:"Výstavní celotvar", hedgehog:"Besednický ježek" };
-    const [min,max] = ranges[rarity] || ranges.common;
-    const weight = random(min,max);
-    const quality = Math.round(random(rarity === "hedgehog" ? 86 : 68, rarity === "hedgehog" ? 99 : 96));
-    const multiplier = rarity === "hedgehog" ? 4200 : rarity === "rare" ? 1900 : rarity === "good" ? 900 : 420;
-    return { id:`s${Date.now()}${Math.random()}`, locality, rarity, documented, weight, quality, name:names[rarity], value:Math.round(weight*multiplier*(quality/75)) };
-  }
-
-  function addStone(stone, x, y) {
-    state.stones.push(stone);
-    state.score += Math.round(stone.value * .22);
-    burst(x,y,stone.rarity === "hedgehog" || stone.rarity === "rare" ? "#f0c96e" : "#76e6bf", stone.rarity === "hedgehog" ? 32 : 18);
-    music.sfx(stone.rarity === "rare" || stone.rarity === "hedgehog" ? "rare" : "good");
-    toast(`${stone.name} · ${stone.weight.toFixed(2)} g`, stone.rarity === "hedgehog" ? "good" : "good", 1700);
-    updateHud();
-  }
-
-  function finishLevel() {
-    if (!goalComplete()) { toast(levelObjective(), "bad"); return; }
-    state.completed[world.id] = true;
-    state.score += 900;
-    saveGame();
-    if (state.levelIndex >= LEVELS.length - 1) { showJury(); return; }
-    state.levelIndex++;
-    showBrief(state.levelIndex);
-  }
-
-  function showJury() {
-    mode = "jury"; setPlaying(false); music.pause(); jurySelection.clear();
-    const list = byId("juryList"); list.innerHTML = "";
-    [...state.stones].sort((a,b) => b.value - a.value).forEach(stone => {
-      const button = document.createElement("button"); button.type = "button"; button.className = "stone-card";
-      button.innerHTML = `<span>◆</span><div><strong>${escapeHtml(stone.name)}</strong><small>${escapeHtml(stone.locality)} · ${stone.weight.toFixed(2)} g · kvalita ${stone.quality}%${stone.documented ? " · doložený" : ""}</small></div>`;
-      button.addEventListener("click", () => {
-        if (jurySelection.has(stone.id)) { jurySelection.delete(stone.id); button.classList.remove("selected"); }
-        else if (jurySelection.size < 3) { jurySelection.add(stone.id); button.classList.add("selected"); }
-        byId("juryCount").textContent = `${jurySelection.size} / 3`;
-        byId("judgeButton").disabled = jurySelection.size !== 3;
-      });
-      list.appendChild(button);
-    });
-    byId("juryCount").textContent = "0 / 3"; byId("judgeButton").disabled = true; showScreen("jury");
-  }
-
-  function judgeCollection() {
-    const chosen = state.stones.filter(s => jurySelection.has(s.id));
-    let jury = state.score;
-    for (const stone of chosen) jury += stone.value * .5 + stone.quality * 22 + (stone.documented ? 900 : 0) + (stone.rarity === "hedgehog" ? 4500 : stone.rarity === "rare" ? 1800 : stone.rarity === "good" ? 600 : 120);
-    jury = Math.round(jury + Math.max(0, 100 - state.caught * 12) * 18);
-    let title = "Výstavní uznání";
-    let text = "Sbírka dorazila do Slávie a získala uznání mezi vystavovateli.";
-    if (jury >= 26000) { title = "Hlavní cena Na zelené vlně"; text = "Vzácná, kvalitní a doložená kolekce získala hlavní cenu večera."; }
-    else if (jury >= 17000) { title = "Cena poroty"; text = "Vyvážená sbírka zaujala původem i kvalitou vybraných kamenů."; }
-    byId("resultTitle").textContent = title; byId("resultScore").textContent = jury.toLocaleString("cs-CZ"); byId("resultText").textContent = text;
-    byId("resultStats").innerHTML = `<div><span>KAMENY</span><strong>${state.stones.length}</strong></div><div><span>DOPADENÍ</span><strong>${state.caught}</strong></div><div><span>LOKALITY</span><strong>${Object.keys(state.completed).length}</strong></div>`;
-    const records = JSON.parse(storage.get(RECORD_KEY) || "[]"); records.push({ score:jury, date:new Date().toISOString() }); records.sort((a,b) => b.score-a.score); storage.set(RECORD_KEY, JSON.stringify(records.slice(0,5)));
-    storage.remove(SAVE_KEY); mode = "result"; showScreen("result");
-  }
-
-  function resetDangerFrame() { danger.active = false; danger.source = ""; danger.rate = 0; danger.catchAfter = Infinity; }
-
-  function reportDanger(source, rate, catchAfter) {
-    danger.active = true;
-    if (rate >= danger.rate) danger.source = source;
-    danger.rate = Math.max(danger.rate, rate);
-    danger.catchAfter = Math.min(danger.catchAfter, catchAfter);
-  }
-
-  function resolveDanger(dt) {
-    state.heat = state.heat || 0;
-    if (danger.active) {
-      danger.exposure += dt;
-      state.heat = clamp(state.heat + danger.rate * dt, 0, 100);
-      if (danger.exposure >= danger.catchAfter) caught(`${danger.source} tě odhalil`);
-    } else {
-      danger.exposure = Math.max(0, danger.exposure - dt * 2.6);
-      state.heat = Math.max(0, state.heat - dt * 13);
-    }
-  }
-
-  function pointInCone(observer, target, range, halfAngle) {
-    const dx = target.x - observer.x, dy = target.y - observer.y;
-    const d = Math.hypot(dx,dy);
-    if (d > range || d < 1) return false;
-    return Math.abs(angleDelta(Math.atan2(dy,dx), observer.angle)) <= halfAngle;
-  }
-
-  function caught(reason) {
-    if (player.invulnerable > 0) return;
-    player.invulnerable = 2;
-    player.x = player.spawnX; player.y = player.spawnY;
-    state.caught++; state.heat = 15; danger.exposure = 0;
-    state.score = Math.max(0, state.score - 250);
-    shake = 13; flash = .28; flashColor = "255,79,70"; music.sfx("alert"); vibrate([60,50,80]);
-    toast(reason, "bad", 1600);
-  }
-
-  function update(dt) {
-    if (mode === "dig") { updateDig(dt); return; }
-    if (mode !== "playing" || !world) return;
-    resetDangerFrame();
-    lookCooldown = Math.max(0, lookCooldown - dt);
-    player.invulnerable = Math.max(0, player.invulnerable - dt);
-    shake = Math.max(0, shake - dt * 24); flash = Math.max(0, flash - dt * .9);
-
-    updatePlayer(dt);
-    updatePatrols(dt);
-    updateBoss(dt);
-    updateParticles(dt);
-    resolveDanger(dt);
-    findNearest(); updateHud(); updateCamera(dt);
-  }
-
-  function updatePlayer(dt) {
-    const length = Math.hypot(input.x,input.y);
-    player.moving = length > .05;
-    if (!player.moving) return;
-    const nx = input.x / Math.max(1,length), ny = input.y / Math.max(1,length);
-    const speed = length > .78 ? 255 : 190;
-    const nextX = clamp(player.x + nx * speed * dt, player.r, world.width - player.r);
-    const nextY = clamp(player.y + ny * speed * dt, player.r, world.height - player.r);
-    player.x = nextX; player.y = nextY;
-    player.angle = Math.atan2(ny,nx); player.step += dt * (length > .78 ? 13 : 9);
-  }
-
-  function updatePatrols(dt) {
-    for (const patrol of world.patrols) {
-      if (!patrol.active || !patrol.path?.length) continue;
-      const target = patrol.path[patrol.pathIndex];
-      const dx = target.x - patrol.x, dy = target.y - patrol.y, d = Math.hypot(dx,dy);
-      if (d < 10) patrol.pathIndex = (patrol.pathIndex + 1) % patrol.path.length;
-      else { patrol.angle = Math.atan2(dy,dx); patrol.x += dx/d * patrol.speed * dt; patrol.y += dy/d * patrol.speed * dt; }
-      if ((patrol.type === "tractor" || patrol.type === "car" || patrol.type === "bike") && distance(player,patrol) < player.r + patrol.radius) caught(patrol.type === "tractor" ? "Traktor tě srazil" : "Pozor na provoz");
-      const condition = typeof patrol.condition === "function" ? patrol.condition() : true;
-      if (patrol.vision > 0 && condition && player.invulnerable <= 0 && pointInCone(patrol,player,patrol.vision,patrol.halfAngle)) reportDanger(patrol.type === "ranger" ? "Lesník" : patrol.type === "farmer" ? "Majitel pole" : "Noční kopáč", 27, 2.25);
-    }
-  }
-
-  function updateBoss(dt) {
-    const boss = world.boss;
-    if (!boss?.active) return;
-    boss.invulnerable = Math.max(0, boss.invulnerable - dt);
-    boss.timer -= dt;
-    if (boss.mode === "dash") {
-      const dx = boss.target.x - boss.x, dy = boss.target.y - boss.y, d = Math.hypot(dx,dy);
-      boss.angle = Math.atan2(dy,dx);
-      if (d > 8) { boss.x += dx/d * boss.speed * dt; boss.y += dy/d * boss.speed * dt; }
-      boss.trail.unshift({x:boss.x,y:boss.y,life:.38}); boss.trail = boss.trail.slice(0,12);
-      if (boss.flashlight && boss.invulnerable <= 0 && pointInCone(boss,player,boss.vision,boss.halfAngle)) reportDanger("Karlova svítilna", 34 + boss.phase * 4, 1.75);
-      if (boss.timer <= 0 || d < 14) { boss.mode = "tired"; boss.timer = Math.max(.75, 1.25 - boss.phase * .1); boss.invulnerable = .08; toast("Boss je vyčerpaný · TEĎ!", "good", 800); }
-    } else {
-      if (boss.timer <= 0) { boss.mode = "dash"; boss.timer = Math.max(.75, 1.35 - boss.phase * .14); boss.target = randomBossTarget(); }
-    }
-    boss.trail.forEach(t => t.life -= dt); boss.trail = boss.trail.filter(t => t.life > 0);
-  }
-
-  function updateParticles(dt) {
-    particles.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 35 * dt; p.life -= dt; });
-    particles = particles.filter(p => p.life > 0);
-  }
-
-  function updateCamera(dt) {
-    const targetX = clamp(player.x - viewport.width / 2, 0, Math.max(0, world.width - viewport.width));
-    const targetY = clamp(player.y - viewport.height / 2, 0, Math.max(0, world.height - viewport.height));
-    const factor = 1 - Math.pow(.001, dt);
-    camera.x += (targetX - camera.x) * factor; camera.y += (targetY - camera.y) * factor;
-  }
-
-  function burst(x,y,color,count) {
-    for (let i=0;i<count;i++) particles.push({x,y,vx:random(-120,120),vy:random(-150,-30),r:random(2,5),life:random(.45,.95),color});
-  }
-
-  function vibrate(pattern) { try { navigator.vibrate?.(pattern); } catch {} }
-
-  function resize() {
-    const rect = app.getBoundingClientRect();
-    viewport.width = Math.max(1, rect.width); viewport.height = Math.max(1, rect.height);
-    viewport.dpr = Math.min(devicePixelRatio || 1, 2);
-    canvas.width = Math.round(viewport.width * viewport.dpr); canvas.height = Math.round(viewport.height * viewport.dpr);
-    canvas.style.width = `${viewport.width}px`; canvas.style.height = `${viewport.height}px`;
-  }
-
-  function render() {
-    context.setTransform(1,0,0,1,0,0);
-    context.fillStyle = "#07120d"; context.fillRect(0,0,canvas.width,canvas.height);
-    context.setTransform(viewport.dpr,0,0,viewport.dpr,0,0);
-    if (!world || !["playing","pause","dialog","dig","identify","theft"].includes(mode)) return;
-    const shakeX = shake > 0 ? random(-shake,shake) : 0, shakeY = shake > 0 ? random(-shake,shake) : 0;
-    context.save(); context.translate(-camera.x + shakeX, -camera.y + shakeY);
-    drawBackground();
-    drawProps();
-    drawHotspotsAndItems();
-    if (world.darkness) drawNightMask();
-    drawVisionCones();
-    drawPatrolsAndNpcs();
-    drawBoss();
-    drawPlayer();
-    drawExit();
-    drawParticles();
-    context.restore();
-    drawVignette();
-    drawObjectiveArrow();
-  }
-
-  function drawBackground() {
-    if (world.id === "chlum") drawChlumBackground();
-    else if (world.id === "locenice") drawLoceniceBackground();
-    else if (world.id === "nesmen") drawNesmenBackground();
-    else if (world.id === "besednice") drawBesedniceBackground();
-    else drawMalseBackground();
-  }
-
-  function drawChlumBackground() {
-    const g = context.createLinearGradient(0,0,0,world.height); g.addColorStop(0,"#88b9dc"); g.addColorStop(.14,"#a9c9d9"); g.addColorStop(.15,"#668451"); g.addColorStop(.26,"#85704d"); g.addColorStop(1,"#4a3425");
-    context.fillStyle=g; context.fillRect(0,0,world.width,world.height);
-    context.fillStyle="#284630"; context.fillRect(0,150,world.width,90);
-    for (let x=0;x<world.width;x+=130) { context.fillStyle=x%260?"#35573b":"#2d4d34"; context.beginPath(); context.moveTo(x,240); context.lineTo(x+60,170); context.lineTo(x+130,240); context.fill(); }
-    for (let y=290;y<world.height+100;y+=115) { context.fillStyle=y%230?"#4a3525":"#513a28"; roundedRect(-20,y,world.width+40,70,32); context.fill(); context.strokeStyle="rgba(210,165,106,.18)"; context.lineWidth=2; for(let x=20;x<world.width;x+=45){context.beginPath();context.moveTo(x,y+7);context.lineTo(x+25,y+62);context.stroke();} }
-  }
-
-  function drawLoceniceBackground() {
-    const g=context.createLinearGradient(0,0,0,world.height);g.addColorStop(0,"#637650");g.addColorStop(1,"#45573c");context.fillStyle=g;context.fillRect(0,0,world.width,world.height);
-    for(let i=0;i<24;i++){const x=100+(i*181)%2050,y=80+(i*229)%1240;context.fillStyle=i%2?"rgba(222,202,158,.35)":"rgba(190,166,119,.28)";context.beginPath();context.ellipse(x,y,170+(i%3)*45,75+(i%4)*18,(i%5)*.13,0,Math.PI*2);context.fill();}
-    context.strokeStyle="#cdb98b";context.lineWidth=94;context.lineCap="round";context.beginPath();context.moveTo(160,1300);context.bezierCurveTo(570,980,650,690,1020,720);context.bezierCurveTo(1480,750,1600,420,2040,140);context.stroke();
-  }
-
-  function drawNesmenBackground() {
-    const g=context.createLinearGradient(0,0,0,world.height);g.addColorStop(0,"#536b46");g.addColorStop(1,"#35452f");context.fillStyle=g;context.fillRect(0,0,world.width,world.height);
-    for(let i=0;i<260;i++){const x=(i*101)%world.width,y=(i*67)%world.height;context.fillStyle=i%3?"rgba(207,187,142,.12)":"rgba(30,57,36,.15)";context.fillRect(x,y,3+(i%3),3+(i%2));}
-    context.strokeStyle="#917850";context.lineWidth=120;context.lineCap="round";context.beginPath();context.moveTo(180,1300);context.bezierCurveTo(580,990,620,660,1060,700);context.bezierCurveTo(1510,740,1600,370,2040,140);context.stroke();
-    context.strokeStyle="rgba(232,215,180,.7)";context.lineWidth=70;context.stroke();
-  }
-
-  function drawBesedniceBackground() {
-    const g=context.createLinearGradient(0,0,0,world.height);g.addColorStop(0,"#263c35");g.addColorStop(.18,"#485748");g.addColorStop(1,"#513a2b");context.fillStyle=g;context.fillRect(0,0,world.width,world.height);
-    context.fillStyle="#263f32";context.fillRect(0,0,world.width,190);
-    for(let i=0;i<18;i++){const x=170+(i*139)%1900,y=190+(i*173)%1050;context.fillStyle=i%2?"rgba(156,117,79,.34)":"rgba(98,70,49,.34)";context.beginPath();context.ellipse(x,y,145+(i%4)*42,68+(i%3)*22,(i%5)*.14,0,Math.PI*2);context.fill();}
-    for(let y=260;y<1250;y+=145){context.strokeStyle="rgba(44,31,23,.34)";context.lineWidth=10;context.setLineDash([20,16]);context.beginPath();context.moveTo(250,y);context.lineTo(1950,y+random(-50,50));context.stroke();context.setLineDash([]);}
-  }
-
-  function drawMalseBackground() {
-    context.fillStyle="#66746e";context.fillRect(0,0,world.width,world.height);
-    const river=context.createLinearGradient(0,0,480,0);river.addColorStop(0,"#1b5263");river.addColorStop(1,"#4290a5");context.fillStyle=river;context.fillRect(0,0,480,world.height);
-    for(let y=0;y<world.height;y+=36){context.fillStyle=y%72?"rgba(255,255,255,.05)":"rgba(190,227,233,.08)";context.fillRect(0,y,480,12);}
-    context.fillStyle="#8b887e";context.fillRect(480,0,130,world.height);context.fillStyle="#bdb8a9";context.fillRect(610,0,420,world.height);context.fillStyle="#42464a";context.fillRect(1030,0,250,world.height);context.fillStyle="#a6a79f";context.fillRect(1280,0,920,world.height);
-    context.strokeStyle="#eadfb8";context.lineWidth=5;context.setLineDash([30,28]);context.beginPath();context.moveTo(1155,0);context.lineTo(1155,world.height);context.stroke();context.setLineDash([]);
-  }
-
-  function drawProps() {
-    const props=[...world.props].sort((a,b)=>a.y-b.y);
-    props.forEach(drawProp);
-  }
-
-  function drawProp(p) {
-    context.save(); context.translate(p.x,p.y); context.rotate(p.angle||0); context.scale(p.scale||1,p.scale||1);
-    if (p.type === "tree" || p.type === "pine") drawTree(p.type === "pine");
-    else if (p.type === "farm" || p.type === "hut") drawBuilding(p.type);
-    else if (p.type === "fieldPit" || p.type === "sandPit" || p.type === "minePit") drawProfile(p.width||140,p.height||70,p.type);
-    else if (p.type === "soilHeap" || p.type === "sandMound" || p.type === "earthBank") drawMound(p.type);
-    else if (p.type === "fern") drawFern();
-    else if (p.type === "excavator") drawExcavator();
-    else if (p.type === "workLamp" || p.type === "lamp") drawLamp(p.type === "workLamp");
-    else if (p.type === "bridge") drawBridge();
-    else if (p.type === "slavia") drawSlavia();
-    else if (p.type === "sign") drawSign(p.text || "");
-    context.restore();
-  }
-
-  function drawTree(pine=false) {
-    context.fillStyle="rgba(0,0,0,.22)";ellipse(0,25,36,12);
-    context.fillStyle=pine?"#8b5738":"#64462f";roundedRect(-7,-54,14,82,5);context.fill();
-    context.fillStyle=pine?"#2c5b3b":"#3f713f";
-    const crowns=pine?[[0,-82,31],[0,-58,37],[0,-32,40]]:[[-18,-52,30],[18,-56,31],[0,-80,35],[0,-31,42]];
-    crowns.forEach(([x,y,r])=>{context.beginPath();context.arc(x,y,r,0,Math.PI*2);context.fill();});
-  }
-
-  function drawBuilding(type) {
-    context.fillStyle="rgba(0,0,0,.25)";ellipse(0,30,70,18);
-    context.fillStyle=type==="farm"?"#d5c8ac":"#72543b";roundedRect(-58,-45,116,75,6);context.fill();
-    context.fillStyle=type==="farm"?"#8e4934":"#7c3d31";context.beginPath();context.moveTo(-70,-45);context.lineTo(0,-91);context.lineTo(70,-45);context.closePath();context.fill();
-    context.fillStyle="#49352b";context.fillRect(-13,-12,26,42);
-  }
-
-  function drawProfile(width,height,type="profile") {
-    const lip=type==="sandPit"?"#d8c39a":type==="minePit"?"#9b704c":"#ad7b4f";
-    const wall=type==="sandPit"?"#9d8861":type==="minePit"?"#684832":"#7d5437";
-    context.fillStyle="rgba(0,0,0,.24)";context.beginPath();context.ellipse(0,16,width*.58,height*.46,0,0,Math.PI*2);context.fill();
-    context.fillStyle=lip;roundedRect(-width/2-11,-height/2-9,width+22,height+18,12);context.fill();
-    context.fillStyle=wall;context.beginPath();context.moveTo(-width/2,-height/2);context.lineTo(width/2,-height/2);context.lineTo(width/2-16,height/2);context.lineTo(-width/2+16,height/2);context.closePath();context.fill();
-    context.fillStyle="#201711";context.beginPath();context.moveTo(-width/2+12,-height/2+10);context.lineTo(width/2-12,-height/2+10);context.lineTo(width/2-28,height/2-8);context.lineTo(-width/2+28,height/2-8);context.closePath();context.fill();
-    context.strokeStyle="rgba(240,211,164,.8)";context.lineWidth=3;context.stroke();
-    context.strokeStyle="rgba(255,255,255,.12)";context.lineWidth=2;context.beginPath();context.moveTo(-width/2+18,-height/2+18);context.lineTo(width/2-18,-height/2+18);context.stroke();
-  }
-
-  function drawMound(type) {
-    context.fillStyle="rgba(0,0,0,.2)";ellipse(0,15,44,13);
-    context.fillStyle=type==="sandMound"?"#c9b488":type==="earthBank"?"#9c7657":"#8a6848";
-    context.beginPath();context.moveTo(-48,15);context.quadraticCurveTo(-17,-28,0,-14);context.quadraticCurveTo(25,-34,51,15);context.closePath();context.fill();
-  }
-
-  function drawFern(){context.strokeStyle="#347448";context.lineWidth=3;[-.8,-.45,-.1,.2,.55,.85].forEach(a=>{context.beginPath();context.moveTo(0,18);context.quadraticCurveTo(a*11,-2,a*18,-27);context.stroke();});}
-
-  function drawExcavator(){
-    context.fillStyle="rgba(0,0,0,.25)";ellipse(0,28,72,19);context.fillStyle="#39342f";roundedRect(-50,10,92,22,9);context.fill();
-    context.strokeStyle="#5d584f";context.lineWidth=4;for(let x=-42;x<36;x+=15){context.beginPath();context.moveTo(x,13);context.lineTo(x+9,29);context.stroke();}
-    context.fillStyle="#d4a52e";roundedRect(-32,-24,58,40,8);context.fill();context.fillStyle="#34434a";roundedRect(-17,-45,35,28,5);context.fill();
-    context.fillStyle="rgba(198,229,238,.38)";context.fillRect(-12,-40,14,15);context.strokeStyle="#d4a52e";context.lineWidth=13;context.lineCap="round";context.beginPath();context.moveTo(24,-18);context.lineTo(62,-55);context.lineTo(98,-28);context.stroke();
-    context.fillStyle="#6d5333";context.beginPath();context.moveTo(89,-37);context.lineTo(118,-24);context.lineTo(96,-7);context.closePath();context.fill();
-  }
-
-  function drawLamp(work=false){context.fillStyle="#3f4546";context.fillRect(-4,-62,8,78);context.fillStyle="#ffe7a4";context.beginPath();context.arc(0,-65,work?13:9,0,Math.PI*2);context.fill();if(work){const g=context.createRadialGradient(0,-65,5,0,-65,85);g.addColorStop(0,"rgba(255,229,153,.2)");g.addColorStop(1,"rgba(255,229,153,0)");context.fillStyle=g;context.beginPath();context.arc(0,-65,85,0,Math.PI*2);context.fill();}}
-  function drawBridge(){context.fillStyle="#527681";roundedRect(-125,-30,250,60,16);context.fill();context.strokeStyle="#b9d7dc";context.lineWidth=4;context.beginPath();context.arc(0,28,113,Math.PI,0);context.stroke();}
-
-  function drawSlavia(){
-    context.fillStyle="rgba(0,0,0,.24)";ellipse(0,78,245,30);
-    context.fillStyle="#fff";context.beginPath();context.moveTo(-235,-120);context.lineTo(-60,-120);context.lineTo(-25,-92);context.lineTo(-25,63);context.lineTo(-235,63);context.closePath();context.fill();
-    context.fillStyle="rgba(160,210,219,.62)";context.beginPath();context.moveTo(-220,-4);context.lineTo(-47,-4);context.lineTo(-47,57);context.lineTo(-220,57);context.closePath();context.fill();
-    context.strokeStyle="rgba(255,255,255,.72)";context.lineWidth=2;for(let x=-205;x<-50;x+=23){context.beginPath();context.moveTo(x,-4);context.lineTo(x,57);context.stroke();}
-    context.fillStyle="#dedbd3";context.beginPath();context.moveTo(-10,-90);context.lineTo(195,-90);context.lineTo(215,-76);context.lineTo(215,63);context.lineTo(-10,63);context.closePath();context.fill();
-    context.fillStyle="#eeeae2";context.beginPath();context.moveTo(-18,-90);context.lineTo(93,-152);context.lineTo(205,-90);context.closePath();context.fill();context.strokeStyle="#999";context.lineWidth=3;context.stroke();
-    context.strokeStyle="#9d9d99";context.beginPath();context.moveTo(-2,-59);context.lineTo(197,-59);context.moveTo(-2,-17);context.lineTo(197,-17);context.stroke();
-    context.fillStyle="#4d5a61";for(let yy=-75;yy<32;yy+=41)for(let xx=20;xx<=174;xx+=38){roundedRect(xx-8,yy,16,26,3);context.fill();}
-    context.fillStyle="#46382e";roundedRect(82,13,32,50,3);context.fill();
-    context.fillStyle="#36006f";roundedRect(-67,-139,130,22,5);context.fill();context.fillStyle="#7fe3bf";context.font="bold 11px sans-serif";context.textAlign="center";context.fillText("NA ZELENÉ VLNĚ",-2,-124);
-  }
-
-  function drawSign(text){context.fillStyle="#744e2f";context.fillRect(-5,-32,10,52);context.fillStyle="#ddd0aa";roundedRect(-52,-57,104,29,5);context.fill();context.fillStyle="#3b3024";context.textAlign="center";context.font="bold 10px sans-serif";context.fillText(text,0,-38);}
-
-  function drawHotspotsAndItems() {
-    world.hotspots.filter(h=>h.active&&h.revealed).forEach(drawHotspot);
-    world.items.filter(i=>i.active&&!i.hidden).forEach(drawItem);
-  }
-
-  function drawHotspot(h) {
-    context.save();context.translate(h.x,h.y);context.rotate(h.angle||0);
-    if (h.profile || h.special) {
-      context.strokeStyle=h.special?"#f0c96e":"#76e6bf";context.lineWidth=3;context.setLineDash([8,6]);roundedRect(-h.width/2-7,-h.height/2-7,h.width+14,h.height+14,9);context.stroke();context.setLineDash([]);drawProfile(h.width,h.height,h.special?"minePit":"profile");
-    } else {
-      const pulse=26+Math.sin(performance.now()*.006+h.x)*3;context.fillStyle="rgba(118,230,191,.12)";context.beginPath();context.arc(0,0,pulse,0,Math.PI*2);context.fill();context.strokeStyle="#76e6bf";context.lineWidth=3;context.setLineDash([7,6]);context.stroke();context.setLineDash([]);
-    }
-    context.restore();
-  }
-
-  function drawItem(item) {
-    context.save();context.translate(item.x,item.y);context.fillStyle="rgba(0,0,0,.2)";ellipse(0,12,18,7);
-    if(item.type==="hole") drawProfile(item.profileWidth||86,item.profileHeight||48,"profile");
-    else if(item.type==="sample"){context.fillStyle=item.sample.real?"#54b77c":"#59c48a";gemPath(0,-4,17);context.fill();context.strokeStyle="rgba(255,255,255,.45)";context.stroke();}
-    else if(item.type==="clue"){context.fillStyle="#f0c96e";roundedRect(-16,-20,32,30,7);context.fill();context.fillStyle="#624b25";context.font="bold 15px sans-serif";context.textAlign="center";context.fillText("?",0,1);}
-    else if(item.type==="document"){context.fillStyle="#eee7d7";roundedRect(-18,-23,36,42,4);context.fill();context.fillStyle="#50677a";for(let y=-15;y<12;y+=8)context.fillRect(-11,y,22,3);}
-    context.restore();
-  }
-
-  function drawNightMask() {
-    context.save();context.fillStyle="rgba(1,7,6,.52)";context.fillRect(0,0,world.width,world.height);context.globalCompositeOperation="destination-out";
-    const g=context.createRadialGradient(player.x,player.y,48,player.x,player.y,350);g.addColorStop(0,"rgba(0,0,0,1)");g.addColorStop(.55,"rgba(0,0,0,.78)");g.addColorStop(1,"rgba(0,0,0,0)");context.fillStyle=g;context.beginPath();context.arc(player.x,player.y,360,0,Math.PI*2);context.fill();context.restore();
-  }
-
-  function drawVisionCones() {
-    world.patrols.forEach(p=>{if(p.active&&p.vision>0&&(typeof p.condition!=="function"||p.condition()))drawCone(p,p.vision,p.halfAngle,false);});
-    if(world.boss?.active&&world.boss.flashlight&&world.boss.mode==="dash")drawCone(world.boss,world.boss.vision,world.boss.halfAngle,true);
-  }
-
-  function drawCone(observer,range,halfAngle,boss) {
-    context.save();context.translate(observer.x,observer.y);context.rotate(observer.angle);const g=context.createRadialGradient(0,0,8,0,0,range);g.addColorStop(0,boss?"rgba(255,239,165,.55)":"rgba(255,215,110,.34)");g.addColorStop(1,"rgba(255,215,110,0)");context.fillStyle=g;context.beginPath();context.moveTo(0,0);context.arc(0,0,range,-halfAngle,halfAngle);context.closePath();context.fill();context.strokeStyle=boss?"rgba(255,236,152,.55)":"rgba(255,215,110,.3)";context.lineWidth=2;context.stroke();context.restore();
-  }
-
-  function drawPatrolsAndNpcs() {
-    world.patrols.filter(p=>p.active).forEach(p=>{if(p.type==="tractor")drawTractor(p);else if(p.type==="car")drawCar(p);else if(p.type==="bike")drawBike(p);else drawActor(p.x,p.y,p.type,p.angle,true);});
-    world.npcs.forEach(n=>drawActor(n.x,n.y,n.role,0,false));
-  }
-
-  function drawActor(x,y,type,angle=0,moving=false) {
-    const colors={farmer:["#8a6544","#bc9868"],ranger:["#3f6847","#75a16f"],digger:["#6f3a36","#b76559"],player:["#4d9164","#9bd2ad"]};
-    const [coat,trim]=colors[type]||colors.farmer;const t=performance.now()*.008+(x+y)*.002;const walk=moving?Math.sin(t)*5:0;
-    context.save();context.translate(x,y);context.fillStyle="rgba(0,0,0,.24)";ellipse(0,18,21,8);context.rotate(angle+Math.PI/2);
-    context.strokeStyle="#273740";context.lineWidth=8;context.lineCap="round";context.beginPath();context.moveTo(-5,2);context.lineTo(-9+walk,23);context.moveTo(5,2);context.lineTo(9-walk,23);context.stroke();
-    context.fillStyle=coat;roundedRect(-17,-29,34,38,10);context.fill();context.fillStyle=trim;roundedRect(-12,-24,24,22,7);context.fill();context.strokeStyle=trim;context.lineWidth=6;context.beginPath();context.moveTo(-13,-17);context.lineTo(-19-walk,-1);context.moveTo(13,-17);context.lineTo(19+walk,-1);context.stroke();
-    context.fillStyle="#d19a73";context.beginPath();context.arc(0,-42,12,0,Math.PI*2);context.fill();context.fillStyle="#20382a";context.beginPath();context.arc(0,-47,12,Math.PI,0);context.fill();roundedRect(-14,-53,28,8,4);context.fill();context.fillStyle="#fff";context.beginPath();context.arc(-4,-42,1.8,0,Math.PI*2);context.arc(4,-42,1.8,0,Math.PI*2);context.fill();context.fillStyle="#222";context.beginPath();context.arc(-4,-42,.8,0,Math.PI*2);context.arc(4,-42,.8,0,Math.PI*2);context.fill();context.restore();
-  }
-
-  function drawPlayer() {
-    context.save();context.translate(player.x,player.y);if(world.darkness){const g=context.createRadialGradient(0,-10,5,0,-10,55);g.addColorStop(0,"rgba(216,255,232,.28)");g.addColorStop(1,"rgba(216,255,232,0)");context.fillStyle=g;context.beginPath();context.arc(0,-10,55,0,Math.PI*2);context.fill();}context.restore();
-    context.globalAlpha=player.invulnerable>0&&Math.floor(player.invulnerable*10)%2===0?.45:1;drawActor(player.x,player.y,"player",player.angle,player.moving);context.globalAlpha=1;
-    if(world.darkness){context.save();context.translate(player.x,player.y);context.strokeStyle="rgba(223,255,236,.65)";context.lineWidth=2;context.beginPath();context.arc(0,-11,25,0,Math.PI*2);context.stroke();context.restore();}
-  }
-
-  function drawBoss() {
-    const boss=world.boss;if(!boss?.active)return;
-    boss.trail.forEach(t=>{context.globalAlpha=clamp(t.life/.38,0,.35);context.fillStyle=boss.type==="karel"?"#f0c96e":"#ff7582";context.beginPath();context.arc(t.x,t.y,17,0,Math.PI*2);context.fill();});context.globalAlpha=1;
-    context.save();context.translate(boss.x,boss.y);const pulse=1+Math.sin(performance.now()*.012)*.06;context.fillStyle=boss.mode==="tired"?"rgba(118,230,191,.34)":"rgba(240,201,110,.23)";context.beginPath();context.arc(0,-16,38*pulse,0,Math.PI*2);context.fill();context.restore();
-    context.save();context.translate(boss.x,boss.y);context.scale(1.35,1.35);drawActor(0,0,"digger",boss.angle,true);context.restore();
-    if(boss.mode==="tired"){context.fillStyle="#f0c96e";context.font="bold 18px sans-serif";context.textAlign="center";context.fillText("✦  ✦  ✦",boss.x,boss.y-76);}
-    const w=Math.max(180,boss.displayName.length*9.5);context.fillStyle="rgba(27,10,10,.9)";roundedRect(boss.x-w/2,boss.y-112,w,32,10);context.fill();context.strokeStyle=boss.type==="karel"?"#f0c96e":"#ff7b87";context.lineWidth=2;context.stroke();context.fillStyle=boss.type==="karel"?"#ffe9b1":"#ffd3d9";context.textAlign="center";context.font="bold 18px sans-serif";context.fillText(boss.displayName,boss.x,boss.y-90);
-  }
-
-  function drawTractor(p){context.save();context.translate(p.x,p.y);context.rotate(p.angle);context.scale(p.scale||1.5,p.scale||1.5);context.fillStyle="rgba(0,0,0,.25)";ellipse(0,25,50,16);context.fillStyle="#b64b2c";roundedRect(-48,-20,76,38,9);context.fill();context.fillStyle="#db6a40";roundedRect(-46,-17,34,15,5);context.fill();context.fillStyle="#315563";roundedRect(-8,-40,34,27,5);context.fill();context.fillStyle="rgba(220,244,255,.28)";context.fillRect(-3,-35,13,13);context.fillRect(12,-35,9,13);context.fillStyle="#252525";context.beginPath();context.arc(-28,24,17,0,Math.PI*2);context.arc(25,22,12,0,Math.PI*2);context.fill();context.fillStyle="#f0d898";context.beginPath();context.arc(31,-2,5,0,Math.PI*2);context.fill();context.restore();}
-  function drawCar(p){context.save();context.translate(p.x,p.y);context.rotate(p.angle);context.fillStyle="rgba(0,0,0,.22)";ellipse(0,12,30,11);context.fillStyle="#8a4742";roundedRect(-28,-15,56,30,9);context.fill();context.fillStyle="#2d4650";roundedRect(-10,-19,25,14,5);context.fill();context.restore();}
-  function drawBike(p){context.save();context.translate(p.x,p.y);context.rotate(p.angle);context.strokeStyle="#263a40";context.lineWidth=3;context.beginPath();context.arc(-12,9,9,0,Math.PI*2);context.arc(12,9,9,0,Math.PI*2);context.stroke();context.beginPath();context.moveTo(-12,9);context.lineTo(0,-4);context.lineTo(12,9);context.moveTo(0,-4);context.lineTo(0,-16);context.stroke();context.fillStyle="#d1a16e";context.beginPath();context.arc(0,-12,7,0,Math.PI*2);context.fill();context.restore();}
-
-  function drawExit(){if(!world.exit)return;context.save();context.translate(world.exit.x,world.exit.y);const active=goalComplete();context.fillStyle=active?"rgba(118,230,191,.2)":"rgba(255,255,255,.06)";context.beginPath();context.arc(0,0,world.exit.radius,0,Math.PI*2);context.fill();context.strokeStyle=active?"#76e6bf":"rgba(255,255,255,.25)";context.lineWidth=4;context.setLineDash([10,8]);context.stroke();context.setLineDash([]);context.fillStyle=active?"#d9ffed":"#bcc7c0";context.textAlign="center";context.font="bold 12px sans-serif";context.fillText(world.exit.label,0,4);context.restore();}
-  function drawParticles(){particles.forEach(p=>{context.globalAlpha=clamp(p.life*1.4,0,1);context.fillStyle=p.color;context.beginPath();context.arc(p.x,p.y,p.r,0,Math.PI*2);context.fill();});context.globalAlpha=1;}
-
-  function drawVignette(){const g=context.createRadialGradient(viewport.width/2,viewport.height/2,Math.min(viewport.width,viewport.height)*.22,viewport.width/2,viewport.height/2,Math.max(viewport.width,viewport.height)*.75);g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,"rgba(0,0,0,.34)");context.fillStyle=g;context.fillRect(0,0,viewport.width,viewport.height);if(flash>0){context.fillStyle=`rgba(${flashColor},${flash})`;context.fillRect(0,0,viewport.width,viewport.height);}}
-
-  function drawObjectiveArrow(){
-    if(!world?.exit)return;let target=world.exit;
-    if(!goalComplete()){
-      const candidates=[];world.hotspots.forEach(h=>{if(h.active&&h.revealed)candidates.push(h);});world.items.forEach(i=>{if(i.active&&!i.hidden)candidates.push(i);});if(world.boss?.active)candidates.push(world.boss);if(candidates.length)target=candidates.sort((a,b)=>distance(player,a)-distance(player,b))[0];
-    }
-    const sx=target.x-camera.x,sy=target.y-camera.y;if(sx>45&&sy>105&&sx<viewport.width-45&&sy<viewport.height-115)return;
-    const cx=viewport.width/2,cy=viewport.height/2,ang=Math.atan2(sy-cy,sx-cx),rad=Math.min(viewport.width,viewport.height)*.38;context.save();context.translate(cx+Math.cos(ang)*rad,cy+Math.sin(ang)*rad);context.rotate(ang);context.fillStyle=goalComplete()?"#76e6bf":"#f0c96e";context.beginPath();context.moveTo(17,0);context.lineTo(-11,-10);context.lineTo(-11,10);context.closePath();context.fill();context.restore();
-  }
-
-  function roundedRect(x,y,w,h,r){context.beginPath();context.roundRect(x,y,w,h,r);}
-  function ellipse(x,y,rx,ry){context.beginPath();context.ellipse(x,y,rx,ry,0,0,Math.PI*2);context.fill();}
-  function gemPath(x,y,r){context.beginPath();context.moveTo(x,y-r);context.lineTo(x+r*.8,y-r*.35);context.lineTo(x+r*.65,y+r*.7);context.lineTo(x,y+r);context.lineTo(x-r*.75,y+r*.35);context.lineTo(x-r*.8,y-r*.4);context.closePath();}
-
-  function bindControls() {
-    const zone=ui.joystick,knob=ui.joystickKnob;
-    const movePointer=e=>{
-      const rect=zone.getBoundingClientRect();const dx=e.clientX-(rect.left+rect.width/2),dy=e.clientY-(rect.top+rect.height/2);const max=rect.width*.33;const len=Math.hypot(dx,dy)||1;const scale=Math.min(1,max/len);const x=dx*scale,y=dy*scale;input.x=x/max;input.y=y/max;knob.style.transform=`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`;
+  function drawExit(e){ctx.save();ctx.translate(e.x,e.y);const pulse=1+Math.sin(performance.now()*.004)*.08;ctx.scale(pulse,pulse);ctx.fillStyle=goalComplete()?"rgba(99,228,155,.19)":"rgba(255,255,255,.05)";ctx.beginPath();ctx.arc(0,0,e.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle=goalComplete()?"#63e49b":"rgba(255,255,255,.25)";ctx.lineWidth=4;ctx.stroke();ctx.fillStyle="#fff";ctx.font="bold 12px sans-serif";ctx.textAlign="center";ctx.fillText(e.label,0,4);ctx.restore();}
+  function drawEffects(){if(scanPulse>0){const radius=260+state.perks.scanner*55,ang=player.angle-Math.PI+scanPulse*Math.PI*2;ctx.save();ctx.translate(player.x,player.y);ctx.rotate(ang);ctx.fillStyle=`rgba(106,236,163,${(1-scanPulse)*.16})`;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,radius,-.34,.34);ctx.closePath();ctx.fill();ctx.strokeStyle=`rgba(142,245,185,${1-scanPulse})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,radius*.72,-.34,.34);ctx.stroke();ctx.restore();}for(const h of world.hazards){ctx.fillStyle="#7b5635";ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.fill();}for(const p of world.particles){ctx.globalAlpha=clamp(p.life*1.4,0,1);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}if(world.theme==="night"){ctx.save();ctx.fillStyle="rgba(2,7,6,.56)";ctx.fillRect(camera.x,camera.y,viewport.w,viewport.h);ctx.globalCompositeOperation="destination-out";const g=ctx.createRadialGradient(player.x,player.y,45,player.x,player.y,285);g.addColorStop(0,"rgba(0,0,0,1)");g.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(player.x,player.y,295,0,Math.PI*2);ctx.fill();ctx.restore();
+      for(const p of world.patrols)if(p.active&&p.vision)drawVisionCone(p,p.vision,p.halfAngle||.57,p.seesPlayer,false);
+      if(world.rival?.active&&world.rival.flashlight)drawVisionCone(world.rival,world.rival.vision,world.rival.halfAngle,world.rival.seesPlayer,true);
+    }}
+  function drawScreenVignette(){const g=ctx.createRadialGradient(viewport.w/2,viewport.h/2,Math.min(viewport.w,viewport.h)*.25,viewport.w/2,viewport.h/2,Math.max(viewport.w,viewport.h)*.72);g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,"rgba(0,0,0,.26)");ctx.fillStyle=g;ctx.fillRect(0,0,viewport.w,viewport.h);if(world?.theme==="field"){ctx.strokeStyle="rgba(190,225,229,.15)";ctx.lineWidth=1;const t=performance.now()*.18;for(let i=0;i<28;i++){const x=(i*83+t)% (viewport.w+80)-40;const y=(i*47+t*.7)% (viewport.h+60)-30;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-8,y+18);ctx.stroke();}}if(flash>0){ctx.fillStyle=`rgba(${flashColor},${flash})`;ctx.fillRect(0,0,viewport.w,viewport.h);}if(state.heat>65){const beat=.55+.45*Math.sin(performance.now()*.012);ctx.strokeStyle=`rgba(208,62,54,${(state.heat-65)/72*(.45+beat*.2)})`;ctx.lineWidth=12+beat*8;ctx.strokeRect(0,0,viewport.w,viewport.h);}}
+  function drawAtmosphereOverlay(){
+    if(!world)return;
+    const palette={
+      field:"126,104,78",meadow:"106,126,82",forest:"91,106,73",night:"30,48,43",city:"92,106,106"
     };
-    zone.addEventListener("pointerdown",e=>{e.preventDefault();joystickPointer=e.pointerId;zone.setPointerCapture?.(e.pointerId);movePointer(e);});
-    zone.addEventListener("pointermove",e=>{if(e.pointerId===joystickPointer)movePointer(e);});
-    const endJoystick=e=>{if(e.pointerId!==joystickPointer)return;joystickPointer=null;input.x=0;input.y=0;knob.style.transform="translate(-50%,-50%)";};
-    zone.addEventListener("pointerup",endJoystick);zone.addEventListener("pointercancel",endJoystick);
-    ui.actionButton.addEventListener("pointerdown",e=>{e.preventDefault();performAction();});
-    addEventListener("keydown",e=>{if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault();if(e.code==="Space")performAction();if(e.code==="Escape")pauseGame();if(e.code==="KeyD"||e.code==="ArrowRight")input.x=1;if(e.code==="KeyA"||e.code==="ArrowLeft")input.x=-1;if(e.code==="KeyS"||e.code==="ArrowDown")input.y=1;if(e.code==="KeyW"||e.code==="ArrowUp")input.y=-1;});
+    const alpha=world.theme==="night"?.13:.045;
+    ctx.fillStyle=`rgba(${palette[world.theme]||palette.field},${alpha})`;
+    ctx.fillRect(0,0,viewport.w,viewport.h);
+    const edge=ctx.createRadialGradient(viewport.w/2,viewport.h/2,Math.min(viewport.w,viewport.h)*.18,viewport.w/2,viewport.h/2,Math.max(viewport.w,viewport.h)*.74);
+    edge.addColorStop(0,"rgba(0,0,0,0)"); edge.addColorStop(.72,"rgba(0,0,0,.06)"); edge.addColorStop(1,"rgba(0,0,0,.42)");
+    ctx.fillStyle=edge;ctx.fillRect(0,0,viewport.w,viewport.h);
+    ctx.globalAlpha=.035;
+    const tick=Math.floor(performance.now()/80);
+    for(let i=0;i<54;i++){const x=(i*89+tick*17)%viewport.w,y=(i*47+tick*11)%viewport.h;ctx.fillStyle=i%2?"#fff":"#000";ctx.fillRect(x,y,1,1);}
+    ctx.globalAlpha=1;
+  }
+  function drawObjectiveArrow(){if(!world||!world.exit)return;let target=world.exit;if(!goalComplete()){const candidates=[];for(const h of world.hotspots)if(h.active&&h.revealed)candidates.push(h);for(const i of world.items)if(i.active&&!i.hidden)candidates.push(i);if(candidates.length)target=candidates.sort((a,b)=>dist(player,a)-dist(player,b))[0];}const sx=target.x-camera.x,sy=target.y-camera.y;if(sx>40&&sy>70&&sx<viewport.w-40&&sy<viewport.h-100)return;const cx=viewport.w/2,cy=viewport.h/2,ang=Math.atan2(sy-cy,sx-cx),rad=Math.min(viewport.w,viewport.h)*.38;ctx.save();ctx.translate(cx+Math.cos(ang)*rad,cy+Math.sin(ang)*rad);ctx.rotate(ang);ctx.fillStyle=goalComplete()?"#63e49b":"#f2cb72";ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-10,-9);ctx.lineTo(-10,9);ctx.closePath();ctx.fill();ctx.restore();}
+
+  function roundRect(c,x,y,w,h,r){c.beginPath();c.roundRect(x,y,w,h,r);}
+  function ellipse(x,y,rx,ry){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill();}
+  function gemPath(x,y,r){ctx.beginPath();ctx.moveTo(x,y-r);ctx.lineTo(x+r*.8,y-r*.35);ctx.lineTo(x+r*.65,y+r*.7);ctx.lineTo(x,y+r);ctx.lineTo(x-r*.75,y+r*.35);ctx.lineTo(x-r*.8,y-r*.4);ctx.closePath();}
+
+  function loop(now){const dt=Math.min(.035,(now-last)/1000||.016);last=now;update(dt);render();requestAnimationFrame(loop);}
+
+  function setupControls(){
+    const zone=$("moveZone"),stick=$("stick");let pid=null;
+    const move=e=>{const r=zone.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),max=r.width*.33,len=Math.hypot(dx,dy)||1,s=Math.min(1,max/len),x=dx*s,y=dy*s;input.x=x/max;input.y=y/max;stick.style.transform=`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`;};
+    zone.addEventListener("pointerdown",e=>{pid=e.pointerId;zone.setPointerCapture(pid);move(e);});zone.addEventListener("pointermove",e=>{if(e.pointerId===pid)move(e);});
+    const end=e=>{if(e.pointerId!==pid)return;pid=null;input.x=input.y=0;stick.style.transform="translate(-50%,-50%)";};zone.addEventListener("pointerup",end);zone.addEventListener("pointercancel",end);
+    const action=$("actionButton");action.addEventListener("pointerdown",e=>{e.preventDefault();action.classList.add("active");haptic(8);performAction();});const stop=()=>action.classList.remove("active");action.addEventListener("pointerup",stop);action.addEventListener("pointercancel",stop);
+    addEventListener("keydown",e=>{if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault();if(e.code==="Space")performAction();if(e.code==="Escape"&&mode==="playing")pause();const x=(e.code==="KeyD"||e.code==="ArrowRight")?1:(e.code==="KeyA"||e.code==="ArrowLeft")?-1:0;const y=(e.code==="KeyS"||e.code==="ArrowDown")?1:(e.code==="KeyW"||e.code==="ArrowUp")?-1:0;if(x)input.x=x;if(y)input.y=y;});
     addEventListener("keyup",e=>{if(["KeyA","KeyD","ArrowLeft","ArrowRight"].includes(e.code))input.x=0;if(["KeyW","KeyS","ArrowUp","ArrowDown"].includes(e.code))input.y=0;});
   }
 
-  function bindUi() {
-    byId("newGameButton").addEventListener("click",startNewGame);
-    byId("continueButton").addEventListener("click",continueGame);
-    byId("howToButton").addEventListener("click",()=>showScreen("how"));
-    byId("closeHowButton").addEventListener("click",()=>showScreen("menu"));
-    byId("enterLevelButton").addEventListener("click",enterLevel);
-    byId("dialogCloseButton").addEventListener("click",closeDialog);
-    byId("digButton").addEventListener("click",digAttempt);
-    byId("moldaviteButton").addEventListener("click",()=>identifySample(true));
-    byId("glassButton").addEventListener("click",()=>identifySample(false));
-    byId("theftContinueButton").addEventListener("click",startBossAfterTheft);
-    byId("pauseButton").addEventListener("click",pauseGame);
-    byId("resumeButton").addEventListener("click",resumeGame);
-    byId("saveExitButton").addEventListener("click",saveAndExit);
-    byId("musicButton").addEventListener("click",()=>{state.settings.music=music.toggle();byId("musicButton").textContent=music.enabled?"♫":"×";saveGame();});
-    byId("judgeButton").addEventListener("click",judgeCollection);
-    byId("restartButton").addEventListener("click",startNewGame);
-    byId("reloadButton").addEventListener("click",()=>location.reload());
+  function pause(){if(mode!=="playing")return;mode="pause";audio.pauseMusic();setPlaying(false);showOnly(screens.pause);}
+  function resume(){screens.pause.classList.remove("visible");mode="playing";audio.resumeMusic();setPlaying(true);last=performance.now();}
+  function toMenu(){save();audio.pauseMusic();mode="menu";world=null;setPlaying(false);showOnly(screens.title);refreshContinue();}
+  function showRecords(){const list=$("recordsList"),rows=getRecords();list.innerHTML="";if(!rows.length){list.innerHTML="<li><span>–</span><div>Zatím žádná dokončená výprava</div></li>";}else rows.forEach((r,i)=>{const li=document.createElement("li");li.innerHTML=`<b>${i+1}.</b><div><strong>${escapeHtml(r.title)}</strong><small>${r.stones} kamenů · ${new Date(r.date).toLocaleDateString("cs-CZ")}</small></div><strong>${Number(r.score).toLocaleString("cs-CZ")}</strong>`;list.append(li);});showOnly(screens.records);}
+
+  function bindUI(){
+    $("playButton").addEventListener("click",startNew);$("continueButton").addEventListener("click",continueGame);$("briefButton").addEventListener("click",enterLevel);
+    $("digButton").addEventListener("click",digAttempt);$("realButton").addEventListener("click",()=>resolveSample(true));$("glassButton").addEventListener("click",()=>resolveSample(false));$("dialogButton").addEventListener("click",closeDialog);
+    $("juryButton").addEventListener("click",judge);$("againButton").addEventListener("click",()=>{state=freshState();world=null;mode="menu";showOnly(screens.title);refreshContinue();});
+    $("pauseButton").addEventListener("click",pause);$("resumeButton").addEventListener("click",resume);$("menuButton").addEventListener("click",toMenu);
+    $("soundButton").addEventListener("click",()=>{state.sound=audio.toggle();$("soundButton").textContent=state.sound?"♫":"×";save();});
+    $("howButton").addEventListener("click",()=>showOnly(screens.how));$("closeHowButton").addEventListener("click",()=>showOnly(screens.title));
+    $("recordsButton").addEventListener("click",showRecords);$("resultRecordsButton").addEventListener("click",showRecords);$("closeRecordsButton").addEventListener("click",()=>showOnly(mode==="result"?screens.result:screens.title));
   }
 
-  function preventZoom() {
-    document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});
-    document.addEventListener("gesturechange",e=>e.preventDefault(),{passive:false});
-    document.addEventListener("gestureend",e=>e.preventDefault(),{passive:false});
-    document.addEventListener("touchmove",e=>{if(e.touches.length>1)e.preventDefault();},{passive:false});
+  function lockPageGestures(){
+    const prevent=e=>e.preventDefault();
+    document.addEventListener("gesturestart",prevent,{passive:false});
+    document.addEventListener("gesturechange",prevent,{passive:false});
+    document.addEventListener("gestureend",prevent,{passive:false});
+    document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});
   }
 
-  function exposeDebug() {
-    if (!(location.search.includes("debug=1") || location.protocol === "about:")) return;
-    window.__GAME_DEBUG__ = {
-      snapshot:()=>({mode,level:world?.id,objective:world?levelObjective():null,heat:state.heat||0,stones:state.stones.length,player:{x:player.x,y:player.y},boss:world?.boss?{active:world.boss.active,mode:world.boss.mode,hits:world.boss.hits,phase:world.boss.phase,x:world.boss.x,y:world.boss.y,angle:world.boss.angle,vision:world.boss.vision}:null,runtime:world?.runtime}),
-      startLevel:index=>{state=createState();state.levelIndex=clamp(index,0,LEVELS.length-1);generateLevel(state.levelIndex);mode="playing";showScreen(null);setPlaying(true);music.pause();},
-      revealAll:()=>{world?.hotspots.forEach(h=>h.revealed=true);world?.items.forEach(i=>i.hidden=false);},
-      setPlayer:(x,y)=>{player.x=x;player.y=y;},
-      triggerTheft:()=>{if(world?.id!=="besednice")return false;world.runtime.stolen=true;mode="theft";setPlaying(false);showScreen("theft");return true;},
-      startKarel:()=>{if(world?.id!=="besednice")return false;mode="playing";showScreen(null);setPlaying(true);spawnBoss("karel",900,600);return true;},
-      makeBossTired:()=>{if(!world?.boss)return false;world.boss.mode="tired";world.boss.timer=1;world.boss.invulnerable=0;player.x=world.boss.x-40;player.y=world.boss.y;findNearest();return true;},
-      placeInBossLight:()=>{if(!world?.boss)return false;const b=world.boss;b.mode="dash";b.timer=2;b.invulnerable=0;player.invulnerable=0;player.x=b.x+Math.cos(b.angle)*Math.min(120,b.vision*.45);player.y=b.y+Math.sin(b.angle)*Math.min(120,b.vision*.45);return true;},
-      hitBoss:()=>hitBoss(),
-      completeCurrent:()=>{if(!world)return;const r=world.runtime;if(world.id==="chlum"){r.permit=true;r.collected=4;}if(world.id==="locenice"){r.correct=5;r.real=3;}if(world.id==="nesmen"){r.permit=true;r.dug=3;r.filled=3;}if(world.id==="besednice"){r.bossDefeated=true;}if(world.id==="malse"){r.documents=3;r.bossDefeated=true;}updateHud();},
-      forceDanger:()=>{if(!world)return;state.heat=80;danger.active=true;updateHud();},
-      finishLevel:()=>finishLevel(),
-      seedCollection:()=>{state.stones=[createStone("Chlum","good",true),createStone("Nesměň","rare",true),createStone("Besednice","hedgehog",true),createStone("Ločenice","common",true)];updateHud();}
-    };
-  }
-
-  function loop(now) {
-    const dt=Math.min(.035,(now-lastTime)/1000||.016);lastTime=now;
-    try { update(dt); render(); }
-    catch(error){ showFatal(error); return; }
-    requestAnimationFrame(loop);
-  }
-
-  function showFatal(error) {
-    console.error(error);
-    mode="error";setPlaying(false);byId("fatalText").textContent=error?.message||String(error);byId("fatalError").classList.remove("is-hidden");
-  }
-
-  function boot() {
-    bindUi(); bindControls(); preventZoom(); resize(); refreshContinue(); exposeDebug();
+  function boot(){
+    resize();lockPageGestures();setupControls();bindUI();migrateLegacySave();refreshContinue();
+    if(new URLSearchParams(location.search).has("debug")){
+      window.__lovecDebug={
+        startLevel(index=0){state=freshState();state.levelIndex=clamp(index,0,LEVELS.length-1);generateLevel(state.levelIndex);mode="playing";showOnly(null);setPlaying(true);return {level:world.id,player:{x:player.x,y:player.y}};},
+        spawnBoss(name="karel"){if(!world)return null;startRival(name,player.x+240,player.y-120);return world.rival;},
+        hitBoss(){hitRival();return world?.rival?{active:world.rival.active,hits:world.rival.hits,maxHits:world.rival.maxHits,phase:world.rival.phase}:null;},
+        setPlayer(x,y){player.x=x;player.y=y;return {x:player.x,y:player.y};},
+        setBossPose(x,y,angle=0){if(!world?.rival)return null;world.rival.x=x;world.rival.y=y;world.rival.angle=angle;world.rival.speed=0;world.rival.target={x,y};return {x,y,angle};},
+        setHeat(value){state.heat=clamp(value,0,100);return state.heat;},
+        snapshot(){return {mode,level:world?.id,heat:state.heat,dangerActive,boss:world?.rival?{name:world.rival.name,active:world.rival.active,hits:world.rival.hits,maxHits:world.rival.maxHits,phase:world.rival.phase}:null};}
+      };
+    }
     addEventListener("resize",()=>requestAnimationFrame(resize));
+    addEventListener("orientationchange",()=>setTimeout(resize,120));
     visualViewport?.addEventListener("resize",()=>requestAnimationFrame(resize));
-    document.addEventListener("visibilitychange",()=>{if(document.hidden&&mode==="playing")pauseGame();});
-    showScreen("menu");
+    document.addEventListener("visibilitychange",()=>{if(document.hidden&&mode==="playing")pause();});
+    if("serviceWorker" in navigator&&location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
     requestAnimationFrame(loop);
   }
-
-  window.addEventListener("error",event=>{if(event.error)showFatal(event.error);});
-  boot();
+  try{boot();}catch(error){console.error(error);$("playButton").disabled=true;$("playButton").innerHTML="<span>CHYBA SPUŠTĚNÍ</span><small>obnov stránku</small>";}
 })();

@@ -1,19 +1,13 @@
-# Lovec vltavínů: Na zelené vlně — Clean Rebuild 6.0
+# Lovec vltavínů: Na zelené vlně — Reborn 5.3
 
-Mobilní Canvas 2D hra vytvořená znovu od základů.
+Aktualizovaná verze webové hry zaměřená na opravu levelu Besednice a pokračování prací na gameplayi, HUDu a animacích postav.
 
-## Obsah
-
-- Chlum: souhlas majitele, sběr na rozoraném poli, velký traktor.
-- Ločenice: písčitý borový les a rozpoznávání vltavínu od skla.
-- Nesměň: obdélníkové profily, kopání a povinné zahrabání.
-- Besednice: tři stopy, ježkový profil, krádež a boss Krystalový Karel.
-- Malše a KD Slávie: dokumentace, Franta, vstup na Na zelené vlně a porota.
-
-## Důležitá technická změna
-
-Projekt nepoužívá service worker. Po novém nasazení proto GitHub Pages nevrací starou verzi hry z vlastní offline cache.
+## Hlavní změny 5.3
+- opravená viditelnost hráče v levelu Besednice;
+- čitelnější noční scéna a větší osobní světelný okruh hráče;
+- otevřenější prostor a lepší orientace v Besednici;
+- postavy se natáčejí podle směru pohybu;
+- lepší průběhové info v HUDu a úvodní tipy k levelu.
 
 ## Nasazení
-
-Rozbal celý obsah ZIPu do kořene nového GitHub repozitáře. V `Settings → Pages` nastav `GitHub Actions`.
+Nahraj celý obsah této složky do nového GitHub repozitáře nebo přepiš stávající soubory v projektu.

@@ -1,13 +1,8 @@
-Lovec vltavínů: Na zelené vlně — Clean Rebuild 6.0
+Lovec vltavínů Reborn 5.3
 
-Status: připraveno pro nový GitHub repozitář
-Engine: Canvas 2D, bez externích knihoven
-Service worker: nepoužit
-Hudební stopy: 5
-Levely: 5
-JavaScript syntax: OK
-HTML vazby: OK
-Assety: OK
-Browser runtime errors: 0 v provedených testech
-
-Viz QA_REPORT.md pro podrobný rozsah testování.
+Status:
+- Besednice visibility fix: applied
+- Stage 2 gameplay continuation: applied
+- Stage 3 HUD/animation continuation: applied
+- JS syntax check: pending external command
+- Approx build size: 8962691 B
